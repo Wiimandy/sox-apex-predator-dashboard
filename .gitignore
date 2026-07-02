@@ -1,0 +1,13 @@
+*
+!/.gitignore
+!/README.md
+!/requirements.txt
+!/generate_apex_predator_dashboard.py
+!/index.html
+!/apex_predator_dashboard.html
+!/.github/
+!/.github/workflows/
+!/.github/workflows/update-dashboard.yml
+
+__pycache__/
+*.pyc
