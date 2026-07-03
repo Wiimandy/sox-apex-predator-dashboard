@@ -996,7 +996,7 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
             <div class="comparison-row emphasis">
               <span>年化報酬率 XIRR</span><b>${pct(m.xirrStrat)}</b><b>${pct(m.xirrDca)}</b><b class="${diffClass(m.xirrDiff)}">${signedPct(m.xirrDiff)}</b>
             </div>
-            <div class="comparison-footnote">差值為 Apex Predator − 純 DCA。百分比差值正值以紅色、負值以綠色表示，金額差值維持藍黑色。總體 XIRR 為年化 XIRR 按完整回測期間複利換算。</div>
+            <div class="comparison-footnote">差值為 Apex Predator − 純 DCA。<br>XIRR（擴展內部報酬率）是專門用來計算「不定期、多筆現金流」的年化報酬率指標。<br>總體 XIRR 為年化 XIRR 按完整回測期間複利換算。</div>
           </div>
           <aside class="trade-summary">
             <div class="trade-title">交易訊號統計</div>
@@ -1640,7 +1640,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
           <b>{pct(metrics['xirr_dca'])}</b>
           <b class="{difference_class(metrics['xirr_diff'])}">{metrics['xirr_diff']:+.2f}%</b>
         </div>
-        <div class="comparison-footnote">差值為 Apex Predator − 純 DCA。百分比差值正值以紅色、負值以綠色表示，並以百分點計算；金額差值維持藍黑色。總體 XIRR 為年化 XIRR 按完整回測期間複利換算。</div>
+        <div class="comparison-footnote">差值為 Apex Predator − 純 DCA。<br>XIRR（擴展內部報酬率）是專門用來計算「不定期、多筆現金流」的年化報酬率指標。<br>總體 XIRR 為年化 XIRR 按完整回測期間複利換算。</div>
       </div>
       <aside class="trade-summary">
         <div class="trade-title">交易訊號統計</div>
