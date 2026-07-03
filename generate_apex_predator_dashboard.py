@@ -1765,7 +1765,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     .rule-table th, .rule-table td {{ padding: 7px 7px; border-right: 1px solid #dfe5ee; border-bottom: 1px solid #dfe5ee; text-align: left; vertical-align: middle; }}
     .rule-table thead th {{ background: #eef4ff; color: #263555; font-size: 15px; }}
     .rule-table thead .rule-group-head th {{ text-align: center; vertical-align: middle; border-right: 1px solid #dbe3ef; }}
-    .rule-table thead .rule-group-head th:last-child {{ text-align: left; border-right: 0; }}
+    .rule-table thead .rule-group-head th:last-child {{ text-align: left; border-left: 1px solid #dfe5ee; border-right: 0; }}
     .rule-table thead .rule-group-head th {{ height: 54px; }}
     .rule-table thead .rule-subhead th {{ height: 28px; padding-top: 4px; padding-bottom: 4px; text-align: center; background: #f5f8fd; border-right: 1px solid #e1e8f3; }}
     .rule-table .rmdd-col {{ width: 17%; }}
@@ -1777,7 +1777,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     .rule-table .rule-cell {{ color: #334155; }}
     .rule-table .amount-cell {{ color: #172554; font-weight: 700; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }}
     .rule-table .grouped-cell {{ vertical-align: middle; }}
-    .rule-table .note-cell {{ color: #334155; line-height: 1.35; }}
+    .rule-table .note-cell {{ border-left: 1px solid #dfe5ee; color: #334155; line-height: 1.35; }}
     .rule-table span {{ color: #64748b; font-weight: 400; font-size: 14px; }}
     .rule-table th:last-child, .rule-table td:last-child {{ border-right: 0; }}
     .rule-table tr:last-child th, .rule-table tr:last-child td {{ border-bottom: 0; }}
