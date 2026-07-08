@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import time
 from html import escape
 from pathlib import Path
 
@@ -60,7 +61,7 @@ CONFIG = {
 }
 
 
-def load_from_yahoo() -> tuple[pd.DataFrame, list[str]]:
+def load_from_yahoo_once() -> tuple[pd.DataFrame, list[str]]:
     import yfinance as yf
 
     symbols = list(YAHOO_TICKERS.values())
@@ -71,6 +72,7 @@ def load_from_yahoo() -> tuple[pd.DataFrame, list[str]]:
         auto_adjust=False,
         progress=False,
         group_by="column",
+        threads=False,
     )
     if raw is None or raw.empty:
         raise ValueError("Yahoo Finance returned no data.")
@@ -109,6 +111,23 @@ def load_from_yahoo() -> tuple[pd.DataFrame, list[str]]:
     if merged.empty:
         raise ValueError("Yahoo Finance data is empty after alignment.")
     return merged, symbols
+
+
+def load_from_yahoo() -> tuple[pd.DataFrame, list[str]]:
+    last_error: Exception | None = None
+    for attempt in range(3):
+        try:
+            return load_from_yahoo_once()
+        except Exception as exc:
+            last_error = exc
+            if attempt < 2:
+                wait_seconds = 5 * (attempt + 1)
+                print(f"Yahoo Finance attempt {attempt + 1} failed: {exc}")
+                print(f"Retrying in {wait_seconds} seconds...")
+                time.sleep(wait_seconds)
+
+    assert last_error is not None
+    raise last_error
 
 
 def load_from_excel(file_path: Path) -> tuple[pd.DataFrame, list[str]]:
@@ -153,6 +172,10 @@ def load_market_data() -> tuple[pd.DataFrame, list[str], str]:
         except Exception as exc:
             if not FALLBACK_TO_EXCEL:
                 raise
+            if not EXCEL_FILE.exists():
+                raise RuntimeError(
+                    "Yahoo Finance failed and the Excel fallback file is not available in this environment."
+                ) from exc
             print(f"Yahoo Finance failed: {exc}")
             print("Falling back to Excel.")
 
