@@ -240,6 +240,7 @@ def run_strategy(df_raw: pd.DataFrame, config: dict) -> dict:
     vix_col = config["VIX_COL"]
     df = mark_fallback_days(calculate_rmdd(df_raw, price_col, config["RMDD_WINDOW"]))
     df = df.loc[config["START_DATE"] : config["END_DATE"]].copy()
+    df["Prev_RMDD"] = df["RMDD"].shift(1)
     df["Cumulative_Return"] = (df[price_col] / df[price_col].iloc[0] - 1) * 100
 
     base_amount = config["BASE_AMOUNT"]
@@ -278,13 +279,34 @@ def run_strategy(df_raw: pd.DataFrame, config: dict) -> dict:
             notes: list[str] = []
             is_sniper = False
 
-            for idx, setting in enumerate(config["LEVEL_CONFIG"]):
-                if rmdd <= setting["threshold"] and not std_triggered[idx]:
+            active_std_indices = [
+                idx
+                for idx, setting in enumerate(config["LEVEL_CONFIG"])
+                if rmdd <= setting["threshold"] and not std_triggered[idx]
+            ]
+            newly_crossed_std_indices = [
+                idx
+                for idx in active_std_indices
+                if pd.isna(row["Prev_RMDD"]) or row["Prev_RMDD"] > config["LEVEL_CONFIG"][idx]["threshold"]
+            ]
+
+            if newly_crossed_std_indices:
+                trigger_std_indices = newly_crossed_std_indices
+            elif i == 0 and active_std_indices:
+                trigger_std_indices = [max(active_std_indices)]
+            else:
+                trigger_std_indices = []
+
+            if trigger_std_indices:
+                deepest_triggered_idx = max(trigger_std_indices)
+                for idx in trigger_std_indices:
+                    setting = config["LEVEL_CONFIG"][idx]
                     add = base_amount * setting["units"]
                     amount += add
-                    std_triggered[idx] = True
-                    month_has_buy = True
                     notes.append(f"{setting['desc']} ({setting['units']}u)")
+                for handled_idx in range(deepest_triggered_idx + 1):
+                    std_triggered[handled_idx] = True
+                month_has_buy = True
 
             if vix > config["VIX_PANIC_THRESHOLD"] and sniper_idx < len(config["SNIPER_CONFIG"]):
                 setting = config["SNIPER_CONFIG"][sniper_idx]
@@ -392,6 +414,7 @@ def js_list(values) -> list:
 def build_market_rows(df_raw: pd.DataFrame, config: dict) -> list[dict]:
     df = mark_fallback_days(calculate_rmdd(df_raw, config["PRICE_COL"], config["RMDD_WINDOW"]))
     df = df.loc[pd.Timestamp(config["CHART_START_DATE"]) :].copy()
+    df["Prev_RMDD"] = df["RMDD"].shift(1)
     rows: list[dict] = []
     for date, row in df.iterrows():
         price = row[config["PRICE_COL"]]
@@ -405,6 +428,7 @@ def build_market_rows(df_raw: pd.DataFrame, config: dict) -> list[dict]:
                 "Close": float(price),
                 "VIX": float(vix),
                 "RMDD": float(rmdd),
+                "PrevRMDD": None if pd.isna(row["Prev_RMDD"]) else float(row["Prev_RMDD"]),
                 "FallbackDay": bool(row["Fallback_Day"]),
             }
         )
@@ -540,7 +564,7 @@ def build_rule_table(config: dict) -> str:
             std_money = money(base * std["units"])
             normal.append((std_text, std_money))
             panic.append((std_text, std_money))
-            note_parts.append("標準防線每月每級最多一次")
+            note_parts.append("新跌破可連續觸發；跨月延續只觸發當下最深層")
 
         if sniper:
             sniper_text = f"{sniper['desc']} {fmt_units(sniper['units'])}"
@@ -563,7 +587,7 @@ def build_rule_table(config: dict) -> str:
         group["row_count"] = max(len(group["normal"]), len(group["panic"]))
         threshold_groups.append(group)
 
-    sniper_note = "標準防線每月每級最多一次；VIX > 32 才啟動；跳空大跌可連續觸發 gap sniper"
+    sniper_note = "新跌破可連續觸發；跨月延續只觸發當下最深層；VIX > 32 才啟動；跳空大跌可連續觸發 gap sniper"
     sniper_note_rowspan = sum(
         group["row_count"] for group in threshold_groups if group["merge_sniper_note"]
     )
@@ -769,15 +793,33 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
           const notes = [];
           let isSniper = false;
 
-          strategyConfig.levelConfig.forEach((setting, idx) => {
-            if (rmdd <= setting.threshold && !stdTriggered[idx]) {
+          const activeStdIndices = strategyConfig.levelConfig
+            .map((setting, idx) => ({ setting, idx }))
+            .filter(({ setting, idx }) => rmdd <= setting.threshold && !stdTriggered[idx])
+            .map(({ idx }) => idx);
+          const newlyCrossedStdIndices = activeStdIndices.filter(idx => (
+            row.PrevRMDD === null
+            || row.PrevRMDD === undefined
+            || Number.isNaN(row.PrevRMDD)
+            || row.PrevRMDD > strategyConfig.levelConfig[idx].threshold
+          ));
+          const triggerStdIndices = newlyCrossedStdIndices.length > 0
+            ? newlyCrossedStdIndices
+            : (index === 0 && activeStdIndices.length > 0 ? [Math.max(...activeStdIndices)] : []);
+
+          if (triggerStdIndices.length > 0) {
+            const deepestTriggeredIdx = Math.max(...triggerStdIndices);
+            triggerStdIndices.forEach(idx => {
+              const setting = strategyConfig.levelConfig[idx];
               const add = strategyConfig.baseAmount * setting.units;
               amount += add;
-              stdTriggered[idx] = true;
-              monthHasBuy = true;
               notes.push(`${setting.desc} (${setting.units}u)`);
+            });
+            for (let handledIdx = 0; handledIdx <= deepestTriggeredIdx; handledIdx += 1) {
+              stdTriggered[handledIdx] = true;
             }
-          });
+            monthHasBuy = true;
+          }
 
           if (vix > strategyConfig.vixPanicThreshold && sniperIdx < strategyConfig.sniperConfig.length) {
             const setting = strategyConfig.sniperConfig[sniperIdx];
@@ -906,11 +948,17 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
     }
 
     function triggeredStandardSet(monthBuys) {
-      return new Set(
-        strategyConfig.levelConfig
-          .filter(setting => monthBuys.some(buy => String(buy.Notes || '').includes(setting.desc)))
-          .map(setting => setting.desc)
-      );
+      const handled = new Set();
+      monthBuys.forEach(buy => {
+        strategyConfig.levelConfig.forEach((setting, idx) => {
+          if (String(buy.Notes || '').includes(setting.desc)) {
+            for (let handledIdx = 0; handledIdx <= idx; handledIdx += 1) {
+              handled.add(strategyConfig.levelConfig[handledIdx].desc);
+            }
+          }
+        });
+      });
+      return handled;
     }
 
     function countTriggeredSnipers(monthBuys) {
@@ -1113,7 +1161,7 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
           const rule = `${std.desc} ${formatUnits(std.units)}`;
           normal.push([rule, money(base * std.units)]);
           panic.push([rule, money(base * std.units)]);
-          notes.push('標準防線每月每級最多一次');
+          notes.push('新跌破可連續觸發；跨月延續只觸發當下最深層');
         }
         if (sniper) {
           panic.push([`${sniper.desc} ${formatUnits(sniper.units)}`, money(base * sniper.units)]);
@@ -1133,7 +1181,7 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
         thresholdGroups.push(group);
       });
 
-      const sniperNote = '標準防線每月每級最多一次；VIX > 32 才啟動；跳空大跌可連續觸發 gap sniper';
+      const sniperNote = '新跌破可連續觸發；跨月延續只觸發當下最深層；VIX > 32 才啟動；跳空大跌可連續觸發 gap sniper';
       const sniperNoteRowspan = thresholdGroups
         .filter(group => group.mergeSniperNote)
         .reduce((total, group) => total + group.rowCount, 0);
