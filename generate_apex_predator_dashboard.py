@@ -1,4 +1,4 @@
-
+﻿
 from __future__ import annotations
 
 import argparse
@@ -44,11 +44,11 @@ CONFIG = {
     "VIX_PANIC_THRESHOLD": 32,
     "REGULAR_IDX_DCA_PURE": 9,
     "LEVEL_CONFIG": [
-        {"threshold": -0.10, "units": 1.0, "desc": "Std Lv1"},
-        {"threshold": -0.175, "units": 1.25, "desc": "Std Lv2"},
-        {"threshold": -0.375, "units": 1.5, "desc": "Std Lv3"},
-        {"threshold": -0.425, "units": 1.75, "desc": "Std Lv4"},
-        {"threshold": -0.575, "units": 2.0, "desc": "Std Lv5"},
+        {"threshold": -0.10, "units": 1.0, "desc": "Lv1"},
+        {"threshold": -0.175, "units": 1.25, "desc": "Lv2"},
+        {"threshold": -0.375, "units": 1.5, "desc": "Lv3"},
+        {"threshold": -0.425, "units": 1.75, "desc": "Lv4"},
+        {"threshold": -0.575, "units": 2.0, "desc": "Lv5"},
     ],
     "SNIPER_CONFIG": [
         {"threshold": -0.175, "units": 0.75, "desc": "Sniper Shot 1"},
@@ -341,7 +341,7 @@ def run_strategy(df_raw: pd.DataFrame, config: dict) -> dict:
                 cost_strat += amount
                 cf_strat.append((date, -amount))
                 month_cost += amount
-                buy_type = "Fallback Buy" if any(n.startswith("Fallback") for n in notes) else ("Sniper Shot" if is_sniper else "Standard Level")
+                buy_type = "Fallback Buy" if any(n.startswith("Fallback") for n in notes) else ("Sniper Shot" if is_sniper else "STD Level Buy")
                 buys.append(
                     {
                         "Date": date,
@@ -564,7 +564,7 @@ def build_rule_table(config: dict) -> str:
             std_money = money(base * std["units"])
             normal.append((std_text, std_money))
             panic.append((std_text, std_money))
-            note_parts.append("新跌破可連續觸發；跨月延續只觸發當下最深層")
+            note_parts.append("新跌破可連續觸發；跨月延續只觸發當下最深層。另外，由於季節效應，若訊號觸發月份為 10 月，則 Lv1 加碼份數為 1.5 份。")
 
         if sniper:
             sniper_text = f"{sniper['desc']} {fmt_units(sniper['units'])}"
@@ -587,7 +587,7 @@ def build_rule_table(config: dict) -> str:
         group["row_count"] = max(len(group["normal"]), len(group["panic"]))
         threshold_groups.append(group)
 
-    sniper_note = "新跌破可連續觸發；跨月延續只觸發當下最深層；VIX > 32 才啟動；跳空大跌可連續觸發 gap sniper"
+    sniper_note = "新跌破可連續觸發；跨月延續只觸發當下最深層。另外，由於季節效應，若訊號觸發月份為 10 月，則 Lv1 加碼份數為 1.5 份。另外，VIX > 32 才啟動；跳空大跌可連續觸發 gap sniper"
     sniper_note_rowspan = sum(
         group["row_count"] for group in threshold_groups if group["merge_sniper_note"]
     )
@@ -859,7 +859,7 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
             monthCost += amount;
             const buyType = notes.some(note => note.startsWith('Fallback'))
               ? 'Fallback Buy'
-              : (isSniper ? 'Sniper Shot' : 'Standard Level');
+              : (isSniper ? 'Sniper Shot' : 'STD Level Buy');
             buys.push({
               Date: row.Date,
               Type: buyType,
@@ -934,7 +934,7 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
         .map(part => {
           const fallbackMatch = part.match(/Fallback Buy \(([-\d.]+)u\)/);
           if (fallbackMatch) return `fallback buy ${formatUnits(Number(fallbackMatch[1]))}`;
-          const standardMatch = part.match(/(Std Lv\d+) \(([-\d.]+)u\)/);
+          const standardMatch = part.match(/(?:Std )?(Lv\d+) \(([-\d.]+)u\)/);
           if (standardMatch) return `${standardMatch[1]} ${formatUnits(Number(standardMatch[2]))}`;
           const sniperMatch = part.match(/SNIPER(?: GAP)? \(([-\d.]+)u\)/);
           if (sniperMatch) {
@@ -1023,11 +1023,10 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
       const totalXirrStrat = (Math.pow(1 + m.xirrStrat / 100, years) - 1) * 100;
       const totalXirrDca = (Math.pow(1 + m.xirrDca / 100, years) - 1) * 100;
       const fallbackCount = result.buys.filter(buy => buy.Type === 'Fallback Buy').length;
-      const standardCount = result.buys.filter(buy => buy.Type === 'Standard Level').length;
+      const standardCount = result.buys.filter(buy => buy.Type === 'STD Level Buy').length;
       const sniperCount = result.buys.filter(buy => buy.Type === 'Sniper Shot').length;
       const monthHasBuy = result.buys.some(buy => buy.Date.slice(0, 7) === m.finalDate.slice(0, 7));
-      document.querySelector('.subtitle').textContent =
-        `資料來源：${sourceLabel}｜原始 ticker：${sourceTickers.join(', ')}｜最新資料日：${m.finalDate}`;
+      document.querySelector('.subtitle').textContent = `最新資料日：${m.finalDate}`;
 
       document.querySelector('.performance').innerHTML = `
         ${renderSignalPanels(result)}
@@ -1161,7 +1160,7 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
           const rule = `${std.desc} ${formatUnits(std.units)}`;
           normal.push([rule, money(base * std.units)]);
           panic.push([rule, money(base * std.units)]);
-          notes.push('新跌破可連續觸發；跨月延續只觸發當下最深層');
+          notes.push('新跌破可連續觸發；跨月延續只觸發當下最深層。另外，由於季節效應，若訊號觸發月份為 10 月，則 Lv1 加碼份數為 1.5 份。');
         }
         if (sniper) {
           panic.push([`${sniper.desc} ${formatUnits(sniper.units)}`, money(base * sniper.units)]);
@@ -1181,7 +1180,7 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
         thresholdGroups.push(group);
       });
 
-      const sniperNote = '新跌破可連續觸發；跨月延續只觸發當下最深層；VIX > 32 才啟動；跳空大跌可連續觸發 gap sniper';
+      const sniperNote = '新跌破可連續觸發；跨月延續只觸發當下最深層。另外，由於季節效應，若訊號觸發月份為 10 月，則 Lv1 加碼份數為 1.5 份。另外，VIX > 32 才啟動；跳空大跌可連續觸發 gap sniper';
       const sniperNoteRowspan = thresholdGroups
         .filter(group => group.mergeSniperNote)
         .reduce((total, group) => total + group.rowCount, 0);
@@ -1228,7 +1227,7 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
         { type: 'scatter', mode: 'lines', name: 'Apex Predator', x: curve.map(r => r.Date), y: curve.map(r => r.Strat_Val), line: { color: '#3f6fb5', width: 3 }, hovertemplate: '%{x}<br>Apex Predator: $%{y:,.0f}<extra></extra>', xaxis: 'x', yaxis: 'y' },
         { type: 'scatter', mode: 'lines', name: 'Pure DCA', x: curve.map(r => r.Date), y: curve.map(r => r.DCA_Val), line: { color: '#8a8a8a', width: 2, dash: 'dash' }, hovertemplate: '%{x}<br>Pure DCA: $%{y:,.0f}<extra></extra>', xaxis: 'x', yaxis: 'y' },
         markerTrace(result, 'Fallback Buy', '#2f7d25', 'circle', 8),
-        markerTrace(result, 'Standard Level', '#ef3b2c', 'triangle-up', 10),
+        markerTrace(result, 'STD Level Buy', '#ef3b2c', 'triangle-up', 10),
         markerTrace(result, 'Sniper Shot', '#7b1fa2', 'star', 14),
         { type: 'scatter', mode: 'lines', name: 'VIX', x: curve.map(r => r.Date), y: curve.map(r => r.VIX), line: { color: '#808080', width: 1.6 }, hovertemplate: '%{x}<br>VIX: %{y:.2f}<extra></extra>', xaxis: 'x2', yaxis: 'y2' },
         { type: 'scatter', mode: 'lines', name: 'RMDD', x: curve.map(r => r.Date), y: curve.map(r => r.RMDD * 100), line: { color: '#4b3cff', width: 2.6 }, fill: 'tozeroy', fillcolor: 'rgba(75, 60, 255, 0.14)', hovertemplate: '%{x}<br>RMDD: %{y:.2f}%<extra></extra>', xaxis: 'x3', yaxis: 'y3' },
@@ -1289,6 +1288,8 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
       });
 
       const counts = buckets.map(bucket => signals.filter(signal => signal.bucket === bucket).length);
+      const totalCount = counts.reduce((sum, value) => sum + value, 0);
+      const probabilities = counts.map(count => totalCount ? (count / totalCount) * 100 : 0);
       const z = holdDays.map(days => (
         buckets.map(bucket => {
           const values = signals
@@ -1305,6 +1306,8 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
         bucketLabels,
         buckets,
         counts,
+        probabilities,
+        totalCount,
         z,
         zForSurface: z.map(row => row.map(value => value === null ? 0 : value)),
       };
@@ -1408,18 +1411,19 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
       const barTrace = {
         type: 'bar',
         x: data.bucketLabels,
-        y: data.counts,
+        y: data.probabilities,
         marker: { color: 'rgba(79, 105, 220, 0.75)', line: { color: '#263555', width: 1 } },
-        text: data.counts.map(value => value ? String(value) : ''),
+        text: data.probabilities.map(value => value ? `${value.toFixed(1)}%` : ''),
         textposition: 'outside',
-        hovertemplate: 'RMDD: %{x}<br>樣本數: %{y}<extra></extra>',
+        customdata: data.counts,
+        hovertemplate: 'RMDD: %{x}<br>發生機率: %{y:.2f}%<br>樣本數: %{customdata} 天<extra></extra>',
       };
       Plotly.react('rmddSampleDistribution', [barTrace], {
         ...sharedLayout,
         height: 380,
-        title: { text: '各 RMDD 回撤區間樣本數分配圖', font: { size: 16 } },
+        title: { text: '各 RMDD 回撤區間發生機率分布圖', font: { size: 16 } },
         xaxis: { title: 'RMDD 買進條件區間', tickangle: -45 },
-        yaxis: { title: '樣本數（發生天數）', gridcolor: '#e5ecf6', rangemode: 'tozero' },
+        yaxis: { title: '發生機率（%）', gridcolor: '#e5ecf6', rangemode: 'tozero', ticksuffix: '%' },
       }, { responsive: true, displaylogo: false });
     }
 
@@ -1517,7 +1521,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
             "yaxis": "y",
         },
         make_marker_trace(buys, "Fallback Buy", "#2f7d25", "circle", 8),
-        make_marker_trace(buys, "Standard Level", "#ef3b2c", "triangle-up", 10),
+        make_marker_trace(buys, "STD Level Buy", "#ef3b2c", "triangle-up", 10),
         make_marker_trace(buys, "Sniper Shot", "#7b1fa2", "star", 14),
         {
             "type": "scatter",
@@ -1613,10 +1617,8 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
         ],
     }
 
-    subtitle = (
-        f"資料來源：{escape(source_label)}｜原始 ticker：{escape(', '.join(map(str, tickers)))}｜"
-        f"最新資料日：{metrics['final_date'].date()}"
-    )
+    subtitle = f"最新資料日：{metrics['final_date'].date()}"
+    source_details = f"資料來源：{escape(source_label)}｜原始 ticker：{escape(', '.join(map(str, tickers)))}"
 
     metrics_cards = f"""
       <div class="card"><span>最新 SOX</span><b>{latest['SOX']:,.2f}</b></div>
@@ -1650,7 +1652,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
         return "diff-neutral"
 
     fallback_count = int((buys["Type"] == "Fallback Buy").sum())
-    standard_count = int((buys["Type"] == "Standard Level").sum())
+    standard_count = int((buys["Type"] == "STD Level Buy").sum())
     sniper_count = int((buys["Type"] == "Sniper Shot").sum())
     performance_summary = f"""
   <section class="performance">
@@ -1753,7 +1755,8 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     header {{ padding: 18px 48px 8px; background: white; border-bottom: 1px solid #e5ecf6; }}
     h1 {{ margin: 0 0 8px; font-size: 30px; }}
     .strategy-intro {{ max-width: 1180px; margin: 0 0 10px; color: #475569; font-size: 14px; line-height: 1.7; }}
-    .strategy-intro p {{ margin: 0; }}
+    .strategy-intro p {{ margin: 0 0 4px; }}
+    .strategy-intro p:last-child {{ margin-bottom: 0; }}
     .strategy-intro b {{ color: #263555; }}
     .subtitle {{ color: #61708a; font-size: 14px; }}
     .date-controls {{ max-width: 1180px; margin: 0 auto; padding: 16px 28px 0; }}
@@ -1885,7 +1888,10 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
   <header>
     <h1>Strategy 12: Apex Predator Dashboard</h1>
     <div class="strategy-intro">
-      <p>Apex Predator 是一套 SOX 定期定額加碼策略：用 <b>RMDD</b> 追蹤 SOX 距離近 252 個交易日高點的回撤，跌破防線時啟動標準加碼；用 <b>VIX</b> 判斷恐慌程度，當 VIX &gt; {CONFIG['VIX_PANIC_THRESHOLD']} 且 RMDD 跌破深層防線時額外啟動 Sniper Shot；最後用 <b>季節效應</b> 調整月底 fallback 買入份數，目前 5/6/7 月少買規則已移除，只保留 10 月 fallback buy 1.5 份，其餘月份為 1 份。</p>
+      <p>Apex Predator 是一套改良版的 SOX 定期定額加碼策略（DCA），共有三大因子：</p>
+      <p><b>1) RMDD</b>－追蹤 SOX 指數 1 年交易日的高點的回撤，跌破設定的防線（Level）時啟動標準加碼（STD Level Buy）</p>
+      <p><b>2) S&amp;P500 恐慌指數 (VIX)</b>－判斷市場系統性恐慌程度，當 VIX 大於一定程度（市場很恐慌），且 RMDD 跌破深層防線時（且市場跌很深），將額外啟動狙擊加碼（Sniper Shot）</p>
+      <p><b>3) 季節效應</b>－根據歷史資料回測，發現 10 月股市的回落程度顯著，因此在該月月底的基礎加碼（Fallback buy）將上調至 1.5 份。</p>
     </div>
     <div class="subtitle">{subtitle}</div>
   </header>
@@ -1902,11 +1908,11 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
   <section class="cards">{metrics_cards}</section>
   {performance_summary}
   <div id="chart"></div>
-  <div class="note">互動提示：拖曳可放大區間，雙擊可重設；右側圖例可點擊開關線條。</div>
+  <div class="note">互動提示：拖曳可放大區間，雙擊可重設；右側圖例可點擊開關線條。｜{source_details}</div>
   {rule_table}
   <section class="parameter-analysis">
     <h2>參數高原分析</h2>
-    <p class="parameter-help">依目前選取日期區間重新計算：RMDD &lt;= -10% 的買進樣本，以 2.5% 回撤區間分組，觀察 1M 到 12M 後續平均報酬與樣本數。</p>
+    <p class="parameter-help">依目前選取日期區間重新計算：RMDD &lt;= -10% 的買進樣本，以 2.5% 回撤區間分組，觀察 1M 到 12M 後續平均報酬與發生機率。</p>
     <div class="parameter-grid">
       <div id="parameterHeatmap" class="parameter-chart"></div>
       <div id="parameterSurface" class="parameter-chart"></div>
