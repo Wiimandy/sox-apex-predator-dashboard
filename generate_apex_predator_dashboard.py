@@ -920,8 +920,10 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
     }
 
     function renderCards(result) {
+      const cards = document.querySelector('.cards');
+      if (!cards) return;
       const latest = result.curve[result.curve.length - 1];
-      document.querySelector('.cards').innerHTML = `
+      cards.innerHTML = `
         <div class="card"><span>最新 SOX</span><b>${latest.SOX.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b></div>
         <div class="card"><span>最新 VIX</span><b>${latest.VIX.toFixed(2)}</b></div>
         <div class="card"><span>目前 RMDD</span><b>${(latest.RMDD * 100).toFixed(2)}%</b></div>
@@ -1032,14 +1034,20 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
       const standardCount = result.buys.filter(buy => buy.Type === 'STD Level Buy').length;
       const sniperCount = result.buys.filter(buy => buy.Type === 'Sniper Shot').length;
       const monthHasBuy = result.buys.some(buy => buy.Date.slice(0, 7) === m.finalDate.slice(0, 7));
-      document.querySelector('.subtitle').textContent = `最新資料日：${m.finalDate}`;
-      document.querySelector('#heroFinalValue').textContent = money(m.finalValStrat);
-      document.querySelector('#heroCost').textContent = money(m.costStrat);
-      document.querySelector('#heroXirr').textContent = pct(m.xirrStrat);
-      document.querySelector('#heroBuyCount').textContent = intFmt.format(result.buys.length);
+      const subtitle = document.querySelector('.subtitle');
+      const heroFinalValue = document.querySelector('#heroFinalValue');
+      const heroCost = document.querySelector('#heroCost');
+      const heroXirr = document.querySelector('#heroXirr');
+      const heroBuyCount = document.querySelector('#heroBuyCount');
+      if (subtitle) subtitle.textContent = `最新資料日：${m.finalDate}`;
+      if (heroFinalValue) heroFinalValue.textContent = money(m.finalValStrat);
+      if (heroCost) heroCost.textContent = money(m.costStrat);
+      if (heroXirr) heroXirr.textContent = pct(m.xirrStrat);
+      if (heroBuyCount) heroBuyCount.textContent = intFmt.format(result.buys.length);
+      const isDetailPage = document.body.dataset.page === 'detail';
 
       document.querySelector('.performance').innerHTML = `
-        ${renderSignalPanels(result)}
+        ${isDetailPage ? renderSignalPanels(result) : ''}
         <div class="section-heading">
           <div>
             <span class="eyebrow">策略績效摘要</span>
@@ -1078,6 +1086,7 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
               <div class="compact-row emphasis"><span>年化 XIRR</span><b>${pct(m.xirrStrat)}</b><b>${pct(m.xirrDca)}</b><b class="${diffClass(m.xirrDiff)}">${signedPct(m.xirrDiff)}</b></div>
             </div>
           </div>
+          ${isDetailPage ? `
           <aside class="trade-summary">
             <div class="trade-title">交易訊號統計</div>
             <div class="trade-total"><div><b>${result.buys.length}</b><span>總買入次數</span></div></div>
@@ -1099,10 +1108,12 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
               </div>
             </div>
           </aside>
+          ` : ''}
         </div>
       `;
 
-      document.querySelector('.detailed-performance').innerHTML = `
+      const detailedPerformance = document.querySelector('.detailed-performance');
+      if (detailedPerformance) detailedPerformance.innerHTML = `
         <div class="section-heading">
           <div>
             <span class="eyebrow">完整績效指標</span>
@@ -1493,10 +1504,10 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
         const result = runStrategy(startInput.value, endInput.value);
         renderCards(result);
         renderPerformance(result);
-        renderRuleTable();
+        if (document.getElementById('ruleTableBody')) renderRuleTable();
         const payload = chartPayload(result);
         Plotly.react('chart', payload.traces, payload.layout, { responsive: true, displaylogo: false, scrollZoom: true });
-        renderParameterCharts(result);
+        if (document.getElementById('parameterHeatmap')) renderParameterCharts(result);
         if (pushState) {
           const params = new URLSearchParams(window.location.search);
           params.set('start', startInput.value);
@@ -1511,21 +1522,34 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
     }
 
     const params = new URLSearchParams(window.location.search);
-    document.getElementById('startDate').value = params.get('start') || strategyConfig.startDate;
-    document.getElementById('endDate').value = params.get('end') || strategyConfig.endDate;
-    const unitParam = Number(params.get('unit') || defaultBaseAmount);
-    document.getElementById('baseAmount').value = Number.isFinite(unitParam) ? Math.min(50000, Math.max(500, unitParam)) : defaultBaseAmount;
-    document.getElementById('applyDates').addEventListener('click', () => applyDates(true));
-    document.getElementById('baseAmount').addEventListener('keydown', event => {
-      if (event.key === 'Enter') applyDates(true);
-    });
-    document.getElementById('resetDates').addEventListener('click', () => {
-      document.getElementById('startDate').value = strategyConfig.startDate;
-      document.getElementById('endDate').value = strategyConfig.endDate;
-      document.getElementById('baseAmount').value = defaultBaseAmount;
-      applyDates(true);
-    });
-    applyDates(false);
+    const startInput = document.getElementById('startDate');
+    const endInput = document.getElementById('endDate');
+    const baseInput = document.getElementById('baseAmount');
+    if (startInput && endInput && baseInput) {
+      startInput.value = params.get('start') || strategyConfig.startDate;
+      endInput.value = params.get('end') || strategyConfig.endDate;
+      const unitParam = Number(params.get('unit') || defaultBaseAmount);
+      baseInput.value = Number.isFinite(unitParam) ? Math.min(50000, Math.max(500, unitParam)) : defaultBaseAmount;
+      document.getElementById('applyDates').addEventListener('click', () => applyDates(true));
+      baseInput.addEventListener('keydown', event => {
+        if (event.key === 'Enter') applyDates(true);
+      });
+      document.getElementById('resetDates').addEventListener('click', () => {
+        startInput.value = strategyConfig.startDate;
+        endInput.value = strategyConfig.endDate;
+        baseInput.value = defaultBaseAmount;
+        applyDates(true);
+      });
+      applyDates(false);
+    } else {
+      const result = runStrategy(strategyConfig.startDate, strategyConfig.endDate);
+      renderCards(result);
+      renderPerformance(result);
+      if (document.getElementById('ruleTableBody')) renderRuleTable();
+      const payload = chartPayload(result);
+      Plotly.react('chart', payload.traces, payload.layout, { responsive: true, displaylogo: false, scrollZoom: true });
+      if (document.getElementById('parameterHeatmap')) renderParameterCharts(result);
+    }
   </script>
 """
     return (
@@ -1536,7 +1560,8 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
     )
 
 
-def build_html(result: dict, tickers: list[str], source_label: str, market_rows: list[dict]) -> str:
+def build_html(result: dict, tickers: list[str], source_label: str, market_rows: list[dict], page_type: str = "detail") -> str:
+    is_detail = page_type == "detail"
     curve = result["curve"]
     buys = result["buys"]
     metrics = result["metrics"]
@@ -1705,6 +1730,37 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     fallback_count = int((buys["Type"] == "Fallback Buy").sum())
     standard_count = int((buys["Type"] == "STD Level Buy").sum())
     sniper_count = int((buys["Type"] == "Sniper Shot").sum())
+    performance_class = "performance detail-performance" if is_detail else "performance pitch-performance"
+    trade_summary_html = f"""
+      <aside class="trade-summary">
+        <div class="trade-title">交易訊號統計</div>
+        <div class="trade-total">
+          <div><b>{len(buys)}</b><span>總買入次數</span></div>
+        </div>
+        <div class="trade-list cumulative-list">
+          <div class="trade-list-head"><span></span><span></span><small>累計</small></div>
+          <div><i class="fallback-dot"></i><span>保底買入</span><b>{fallback_count}</b></div>
+          <div><i class="standard-dot"></i><span>標準防線</span><b>{standard_count}</b></div>
+          <div><i class="sniper-dot"></i><span>狙擊觸發</span><b>{sniper_count}</b></div>
+        </div>
+        <p>狙擊條件：VIX &gt; {CONFIG['VIX_PANIC_THRESHOLD']} 且 RMDD 跌破對應防線。</p>
+        <div class="annual-section">
+          <div class="trade-title">交易訊號統計</div>
+          <div class="annual-total"><b>{len(buys) / years:.1f}</b><span>次／年</span></div>
+          <div class="trade-list annual-list">
+            <div class="trade-list-head"><span></span><span></span><small>年均</small></div>
+            <div><i class="fallback-dot"></i><span>保底買入</span><em>{fallback_count / years:.1f}</em></div>
+            <div><i class="standard-dot"></i><span>標準防線</span><em>{standard_count / years:.1f}</em></div>
+            <div><i class="sniper-dot"></i><span>狙擊觸發</span><em>{sniper_count / years:.1f}</em></div>
+          </div>
+        </div>
+      </aside>
+""" if is_detail else ""
+    hero_actions = (
+        '<div class="hero-actions"><a class="nav-button primary" href="apex_predator_dashboard.html">查看完整策略細節</a></div>'
+        if not is_detail
+        else '<div class="hero-actions"><a class="nav-button" href="index.html">返回 Pitch 頁</a></div>'
+    )
     report_summary = f"""
   <header class="report-hero">
     <div class="hero-inner">
@@ -1717,6 +1773,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
           <span>{start_date.date()} 至 {metrics['final_date'].date()}</span>
           <span>約 {years:.1f} 年</span>
         </div>
+        {hero_actions}
       </div>
       <div class="hero-stats" aria-label="核心績效數字">
         <div class="hero-stat">
@@ -1838,7 +1895,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
   </section>
 """
     performance_summary = f"""
-  <section class="performance">
+  <section class="{performance_class}">
     <div class="section-heading">
       <div>
         <span class="eyebrow">策略績效摘要</span>
@@ -1877,33 +1934,60 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
           <div class="compact-row emphasis"><span>年化 XIRR</span><b>{pct(metrics['xirr_strat'])}</b><b>{pct(metrics['xirr_dca'])}</b><b class="{difference_class(metrics['xirr_diff'])}">{metrics['xirr_diff']:+.2f}%</b></div>
         </div>
       </div>
-      <aside class="trade-summary">
-        <div class="trade-title">交易訊號統計</div>
-        <div class="trade-total">
-          <div><b>{len(buys)}</b><span>總買入次數</span></div>
-        </div>
-        <div class="trade-list cumulative-list">
-          <div class="trade-list-head"><span></span><span></span><small>累計</small></div>
-          <div><i class="fallback-dot"></i><span>保底買入</span><b>{fallback_count}</b></div>
-          <div><i class="standard-dot"></i><span>標準防線</span><b>{standard_count}</b></div>
-          <div><i class="sniper-dot"></i><span>狙擊觸發</span><b>{sniper_count}</b></div>
-        </div>
-        <p>狙擊條件：VIX &gt; {CONFIG['VIX_PANIC_THRESHOLD']} 且 RMDD 跌破對應防線。</p>
-        <div class="annual-section">
-          <div class="trade-title">交易訊號統計</div>
-          <div class="annual-total"><b>{len(buys) / years:.1f}</b><span>次／年</span></div>
-          <div class="trade-list annual-list">
-            <div class="trade-list-head"><span></span><span></span><small>年均</small></div>
-            <div><i class="fallback-dot"></i><span>保底買入</span><em>{fallback_count / years:.1f}</em></div>
-            <div><i class="standard-dot"></i><span>標準防線</span><em>{standard_count / years:.1f}</em></div>
-            <div><i class="sniper-dot"></i><span>狙擊觸發</span><em>{sniper_count / years:.1f}</em></div>
-          </div>
-        </div>
-      </aside>
+      {trade_summary_html}
     </div>
   </section>
 """
     rule_table = build_rule_table(CONFIG)
+    date_controls = """
+  <section class="date-controls">
+    <div class="date-panel">
+      <label>起始日期<input id="startDate" type="date"></label>
+      <label>結束日期<input id="endDate" type="date"></label>
+      <label>一份金額<input id="baseAmount" type="number" min="500" max="50000" step="500" inputmode="numeric"></label>
+      <button id="applyDates" type="button">套用設定</button>
+      <button id="resetDates" class="secondary" type="button">回到預設</button>
+      <span id="dateStatus" class="date-status"></span>
+    </div>
+  </section>
+"""
+    market_cards = f'<section class="cards">{metrics_cards}</section>'
+    detail_header = """
+  <section class="detail-header">
+    <div>
+      <span class="eyebrow">策略 Detail</span>
+      <h2>策略監控、規則與參數分析</h2>
+    </div>
+    <a class="nav-button" href="index.html">返回 Pitch 頁</a>
+  </section>
+"""
+    parameter_analysis = """
+  <section class="parameter-analysis">
+    <h2>參數高原分析</h2>
+    <p class="parameter-help">依目前選取日期區間重新計算：RMDD &lt;= -10% 的買進樣本，以 2.5% 回撤區間分組，觀察 1M 到 12M 後續平均報酬與發生機率。</p>
+    <div class="parameter-grid">
+      <div id="parameterHeatmap" class="parameter-chart"></div>
+      <div id="parameterSurface" class="parameter-chart"></div>
+      <div id="rmddSampleDistribution" class="parameter-chart wide"></div>
+    </div>
+  </section>
+"""
+    pitch_chart_intro = """
+  <section class="chart-intro">
+    <div>
+      <span class="eyebrow">互動式回測圖表</span>
+      <h2>先看長期曲線，再決定要不要深入規則。</h2>
+    </div>
+    <a class="nav-button primary" href="apex_predator_dashboard.html">查看完整策略細節</a>
+  </section>
+"""
+    pre_performance_sections = f"{detail_header}{date_controls}{market_cards}" if is_detail else ""
+    pre_chart_sections = "" if is_detail else pitch_chart_intro
+    post_chart_sections = (
+        f"{detailed_performance_summary}{rule_table}{parameter_analysis}{strategy_details}"
+        if is_detail
+        else ""
+    )
 
     return f"""<!doctype html>
 <html lang="zh-Hant">
@@ -1947,6 +2031,9 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     .hero-meta {{ display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; color: var(--muted); font-size: 13px; }}
     .hero-meta span {{ padding: 8px 11px; background: rgba(13, 26, 39, 0.86); border: 1px solid var(--line); border-radius: 6px; }}
     .subtitle {{ color: var(--cyan); font-weight: 700; }}
+    .hero-actions {{ display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }}
+    .nav-button {{ display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 0 15px; border: 1px solid var(--line); border-radius: 6px; color: var(--soft); text-decoration: none; font-size: 13px; font-weight: 700; }}
+    .nav-button.primary {{ color: #031018; background: var(--cyan); border-color: rgba(98, 230, 255, 0.58); }}
     .hero-stats {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }}
     .hero-stat {{ min-height: 118px; padding: 18px; background: linear-gradient(180deg, rgba(20, 40, 61, 0.92), rgba(10, 24, 37, 0.92)); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 18px 50px rgba(0, 0, 0, 0.32); }}
     .hero-stat:nth-child(1), .hero-stat:nth-child(3) {{ border-color: rgba(98, 230, 255, 0.34); }}
@@ -1961,6 +2048,9 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     .factor-card span {{ color: var(--amber); font-size: 12px; font-weight: 700; }}
     .factor-card h3 {{ margin: 24px 0 10px; color: var(--text); font-size: 22px; }}
     .factor-card p {{ margin: 0; color: var(--soft); font-size: 14px; line-height: 1.7; }}
+    .detail-header, .chart-intro {{ display: flex; justify-content: space-between; align-items: end; gap: 18px; max-width: 1180px; margin: 28px auto 0; padding: 0 28px; }}
+    .detail-header h2, .chart-intro h2 {{ margin: 4px 0 0; color: var(--text); font-size: 28px; line-height: 1.22; }}
+    .chart-intro {{ margin-top: 34px; }}
     .date-controls {{ max-width: 1180px; margin: 0 auto; padding: 18px 28px 0; }}
     .date-panel {{ display: flex; align-items: end; gap: 12px; flex-wrap: wrap; background: rgba(13, 26, 39, 0.92); border: 1px solid var(--line); border-radius: 8px; padding: 14px; }}
     .date-panel label {{ display: grid; gap: 6px; color: var(--muted); font-size: 12px; }}
@@ -1995,6 +2085,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     .period {{ color: var(--soft); font-size: 14px; text-align: right; }}
     .period span {{ display: block; margin-top: 3px; color: var(--muted); font-size: 12px; }}
     .performance-grid {{ display: grid; grid-template-columns: minmax(0, 2.25fr) minmax(240px, 0.75fr); gap: 12px; }}
+    .pitch-performance .performance-grid {{ grid-template-columns: 1fr; }}
     .summary-panel {{ display: grid; gap: 12px; }}
     .outcome-grid {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }}
     .outcome-card {{ min-height: 134px; padding: 18px; background: rgba(13, 26, 39, 0.94); border: 1px solid var(--line); border-radius: 8px; }}
@@ -2126,34 +2217,14 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     }}
   </style>
 </head>
-<body>
+<body data-page="{page_type}">
   {report_summary}
-  <section class="date-controls">
-    <div class="date-panel">
-      <label>起始日期<input id="startDate" type="date"></label>
-      <label>結束日期<input id="endDate" type="date"></label>
-      <label>一份金額<input id="baseAmount" type="number" min="500" max="50000" step="500" inputmode="numeric"></label>
-      <button id="applyDates" type="button">套用設定</button>
-      <button id="resetDates" class="secondary" type="button">回到預設</button>
-      <span id="dateStatus" class="date-status"></span>
-    </div>
-  </section>
-  <section class="cards">{metrics_cards}</section>
+  {pre_performance_sections}
   {performance_summary}
+  {pre_chart_sections}
   <div id="chart"></div>
   <div class="note">互動提示：拖曳可放大區間，雙擊可重設；右側圖例可點擊開關線條。｜{source_details}</div>
-  {rule_table}
-  <section class="parameter-analysis">
-    <h2>參數高原分析</h2>
-    <p class="parameter-help">依目前選取日期區間重新計算：RMDD &lt;= -10% 的買進樣本，以 2.5% 回撤區間分組，觀察 1M 到 12M 後續平均報酬與發生機率。</p>
-    <div class="parameter-grid">
-      <div id="parameterHeatmap" class="parameter-chart"></div>
-      <div id="parameterSurface" class="parameter-chart"></div>
-      <div id="rmddSampleDistribution" class="parameter-chart wide"></div>
-    </div>
-  </section>
-  {strategy_details}
-  {detailed_performance_summary}
+  {post_chart_sections}
   {interactive_script}
 </body>
 </html>"""
@@ -2174,9 +2245,10 @@ def main() -> None:
 
     result = run_strategy(merged, CONFIG)
     market_rows = build_market_rows(merged, CONFIG)
-    html = build_html(result, tickers, source_label, market_rows)
-    OUT_FILE.write_text(html, encoding="utf-8")
-    PAGES_FILE.write_text(html, encoding="utf-8")
+    detail_html = build_html(result, tickers, source_label, market_rows, page_type="detail")
+    pitch_html = build_html(result, tickers, source_label, market_rows, page_type="pitch")
+    OUT_FILE.write_text(detail_html, encoding="utf-8")
+    PAGES_FILE.write_text(pitch_html, encoding="utf-8")
     metrics = result["metrics"]
     buys = result["buys"]
     print(f"Wrote: {OUT_FILE}")
