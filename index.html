@@ -4,6 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Strategy 12: Apex Predator Dashboard</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <meta name="theme-color" content="#263555">
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
   <style>
     body { margin: 0; font-family: Arial, 'Microsoft JhengHei', 'Noto Sans TC', sans-serif; background: #f6f8fb; color: #263555; }
@@ -889,7 +893,7 @@
         ...strategyConfig.sniperConfig.map(setting => ({ type: 'line', xref: 'paper', x0: 0, x1: 0.83, yref: 'y3', y0: setting.threshold * 100, y1: setting.threshold * 100, line: { color: '#e11d48', width: 1.5, dash: 'solid' } })),
       ];
       const layout = {
-        title: { text: 'Strategy 12: Apex Predator Dashboard', x: 0.02, font: { size: 28 } },
+        title: { text: '', x: 0.02, font: { size: 28 } },
         paper_bgcolor: 'white',
         plot_bgcolor: 'white',
         font: { family: 'Arial, Microsoft JhengHei, Noto Sans TC, sans-serif', color: '#2d3a5d', size: 14 },
@@ -907,7 +911,7 @@
         yaxis4: { domain: [0.02, 0.16], title: 'SOX Return (%)', gridcolor: '#e5ecf6', ticksuffix: '%' },
         shapes,
         annotations: [
-          { text: 'Portfolio Value ($) & Buy Events', xref: 'paper', yref: 'paper', x: 0.42, y: 1.04, showarrow: false, font: { size: 24 } },
+          { text: 'Apex Predator Strategy<br>Portfolio Value ($) & Buy Events', xref: 'paper', yref: 'paper', x: 0.42, y: 1.04, showarrow: false, font: { size: 24 } },
           { text: 'VIX Index', xref: 'paper', yref: 'paper', x: 0.42, y: 0.56, showarrow: false, font: { size: 22 } },
           { text: 'RMDD Zones', xref: 'paper', yref: 'paper', x: 0.42, y: 0.37, showarrow: false, font: { size: 22 } },
           { text: 'SOX Cumulative Return', xref: 'paper', yref: 'paper', x: 0.42, y: 0.18, showarrow: false, font: { size: 22 } },

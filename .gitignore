@@ -5,6 +5,12 @@
 !/generate_apex_predator_dashboard.py
 !/index.html
 !/apex_predator_dashboard.html
+!/site.webmanifest
+!/assets/
+!/assets/favicon.svg
+!/assets/icon-192.png
+!/assets/icon-512.png
+!/assets/apple-touch-icon.png
 !/.github/
 !/.github/workflows/
 !/.github/workflows/update-dashboard.yml
