@@ -1228,44 +1228,44 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
       const endYear = Number(result.metrics.finalDate.slice(0, 4)) + 1;
       const chartRange = [result.metrics.startDate, `${endYear}-12-31`];
       const traces = [
-        { type: 'scatter', mode: 'lines', name: 'Apex Predator', x: curve.map(r => r.Date), y: curve.map(r => r.Strat_Val), line: { color: '#3f6fb5', width: 3 }, hovertemplate: '%{x}<br>Apex Predator: $%{y:,.0f}<extra></extra>', xaxis: 'x', yaxis: 'y' },
-        { type: 'scatter', mode: 'lines', name: 'Pure DCA', x: curve.map(r => r.Date), y: curve.map(r => r.DCA_Val), line: { color: '#8a8a8a', width: 2, dash: 'dash' }, hovertemplate: '%{x}<br>Pure DCA: $%{y:,.0f}<extra></extra>', xaxis: 'x', yaxis: 'y' },
-        markerTrace(result, 'Fallback Buy', '#2f7d25', 'circle', 8),
-        markerTrace(result, 'STD Level Buy', '#ef3b2c', 'triangle-up', 10),
-        markerTrace(result, 'Sniper Shot', '#7b1fa2', 'star', 14),
-        { type: 'scatter', mode: 'lines', name: 'VIX', x: curve.map(r => r.Date), y: curve.map(r => r.VIX), line: { color: '#808080', width: 1.6 }, hovertemplate: '%{x}<br>VIX: %{y:.2f}<extra></extra>', xaxis: 'x2', yaxis: 'y2' },
-        { type: 'scatter', mode: 'lines', name: 'RMDD', x: curve.map(r => r.Date), y: curve.map(r => r.RMDD * 100), line: { color: '#4b3cff', width: 2.6 }, fill: 'tozeroy', fillcolor: 'rgba(75, 60, 255, 0.14)', hovertemplate: '%{x}<br>RMDD: %{y:.2f}%<extra></extra>', xaxis: 'x3', yaxis: 'y3' },
-        { type: 'scatter', mode: 'lines', name: 'SOX Return', x: curve.map(r => r.Date), y: curve.map(r => r.Cum_Ret), line: { color: '#f59e0b', width: 2 }, hovertemplate: '%{x}<br>SOX Return: %{y:.2f}%<extra></extra>', xaxis: 'x4', yaxis: 'y4' },
+        { type: 'scatter', mode: 'lines', name: 'Apex Predator', x: curve.map(r => r.Date), y: curve.map(r => r.Strat_Val), line: { color: '#62e6ff', width: 3.4 }, hovertemplate: '%{x}<br>Apex Predator: $%{y:,.0f}<extra></extra>', xaxis: 'x', yaxis: 'y' },
+        { type: 'scatter', mode: 'lines', name: 'Pure DCA', x: curve.map(r => r.Date), y: curve.map(r => r.DCA_Val), line: { color: '#9db0c4', width: 2, dash: 'dash' }, hovertemplate: '%{x}<br>Pure DCA: $%{y:,.0f}<extra></extra>', xaxis: 'x', yaxis: 'y' },
+        markerTrace(result, 'Fallback Buy', '#46e6a8', 'circle', 8),
+        markerTrace(result, 'STD Level Buy', '#ff6b7a', 'triangle-up', 10),
+        markerTrace(result, 'Sniper Shot', '#b38cff', 'star', 14),
+        { type: 'scatter', mode: 'lines', name: 'VIX', x: curve.map(r => r.Date), y: curve.map(r => r.VIX), line: { color: '#ffd166', width: 1.8 }, hovertemplate: '%{x}<br>VIX: %{y:.2f}<extra></extra>', xaxis: 'x2', yaxis: 'y2' },
+        { type: 'scatter', mode: 'lines', name: 'RMDD', x: curve.map(r => r.Date), y: curve.map(r => r.RMDD * 100), line: { color: '#66a6ff', width: 2.6 }, fill: 'tozeroy', fillcolor: 'rgba(102, 166, 255, 0.16)', hovertemplate: '%{x}<br>RMDD: %{y:.2f}%<extra></extra>', xaxis: 'x3', yaxis: 'y3' },
+        { type: 'scatter', mode: 'lines', name: 'SOX Return', x: curve.map(r => r.Date), y: curve.map(r => r.Cum_Ret), line: { color: '#46e6a8', width: 2 }, hovertemplate: '%{x}<br>SOX Return: %{y:.2f}%<extra></extra>', xaxis: 'x4', yaxis: 'y4' },
       ];
       const shapes = [
-        { type: 'line', xref: 'paper', x0: 0, x1: 0.83, yref: 'y2', y0: strategyConfig.vixPanicThreshold, y1: strategyConfig.vixPanicThreshold, line: { color: '#7b1fa2', width: 2, dash: 'dash' } },
-        ...strategyConfig.levelConfig.map(setting => ({ type: 'line', xref: 'paper', x0: 0, x1: 0.83, yref: 'y3', y0: setting.threshold * 100, y1: setting.threshold * 100, line: { color: '#999999', width: 1, dash: 'dot' } })),
-        ...strategyConfig.sniperConfig.map(setting => ({ type: 'line', xref: 'paper', x0: 0, x1: 0.83, yref: 'y3', y0: setting.threshold * 100, y1: setting.threshold * 100, line: { color: '#e11d48', width: 1.5, dash: 'solid' } })),
+        { type: 'line', xref: 'paper', x0: 0, x1: 0.83, yref: 'y2', y0: strategyConfig.vixPanicThreshold, y1: strategyConfig.vixPanicThreshold, line: { color: '#b38cff', width: 2, dash: 'dash' } },
+        ...strategyConfig.levelConfig.map(setting => ({ type: 'line', xref: 'paper', x0: 0, x1: 0.83, yref: 'y3', y0: setting.threshold * 100, y1: setting.threshold * 100, line: { color: 'rgba(199, 215, 232, 0.54)', width: 1, dash: 'dot' } })),
+        ...strategyConfig.sniperConfig.map(setting => ({ type: 'line', xref: 'paper', x0: 0, x1: 0.83, yref: 'y3', y0: setting.threshold * 100, y1: setting.threshold * 100, line: { color: '#ff6b7a', width: 1.5, dash: 'solid' } })),
       ];
       const layout = {
         title: { text: '', x: 0.02, font: { size: 28 } },
-        paper_bgcolor: 'white',
-        plot_bgcolor: 'white',
-        font: { family: 'Arial, Microsoft JhengHei, Noto Sans TC, sans-serif', color: '#2d3a5d', size: 14 },
+        paper_bgcolor: '#071019',
+        plot_bgcolor: '#0d1a27',
+        font: { family: 'Arial, Microsoft JhengHei, Noto Sans TC, sans-serif', color: '#c7d7e8', size: 14 },
         height: 1040,
         margin: { l: 74, r: 230, t: 82, b: 70 },
         hovermode: 'x unified',
-        legend: { x: 1.02, y: 0.99, xanchor: 'left', yanchor: 'top', font: { size: 16 } },
-        xaxis: { domain: [0, 0.84], anchor: 'y', range: chartRange, showgrid: true, gridcolor: '#e5ecf6', showticklabels: false },
-        yaxis: { domain: [0.60, 1.0], title: 'Portfolio Value ($)', gridcolor: '#e5ecf6', tickformat: '~s' },
-        xaxis2: { domain: [0, 0.84], anchor: 'y2', matches: 'x', showgrid: true, gridcolor: '#e5ecf6', showticklabels: false },
-        yaxis2: { domain: [0.40, 0.54], title: 'VIX', gridcolor: '#e5ecf6' },
-        xaxis3: { domain: [0, 0.84], anchor: 'y3', matches: 'x', showgrid: true, gridcolor: '#e5ecf6', showticklabels: false },
-        yaxis3: { domain: [0.21, 0.35], title: 'RMDD (%)', gridcolor: '#e5ecf6', ticksuffix: '%' },
-        xaxis4: { domain: [0, 0.84], anchor: 'y4', matches: 'x', range: chartRange, showgrid: true, gridcolor: '#e5ecf6', rangeslider: { visible: true, thickness: 0.06 } },
-        yaxis4: { domain: [0.02, 0.16], title: 'SOX Return (%)', gridcolor: '#e5ecf6', ticksuffix: '%' },
+        legend: { x: 1.02, y: 0.99, xanchor: 'left', yanchor: 'top', font: { size: 16, color: '#f4fbff' }, bgcolor: 'rgba(13, 26, 39, 0.72)', bordercolor: 'rgba(149, 179, 210, 0.22)', borderwidth: 1 },
+        xaxis: { domain: [0, 0.84], anchor: 'y', range: chartRange, showgrid: true, gridcolor: 'rgba(149, 179, 210, 0.16)', zerolinecolor: 'rgba(149, 179, 210, 0.22)', showticklabels: false },
+        yaxis: { domain: [0.60, 1.0], title: 'Portfolio Value ($)', gridcolor: 'rgba(149, 179, 210, 0.16)', zerolinecolor: 'rgba(149, 179, 210, 0.22)', tickformat: '~s' },
+        xaxis2: { domain: [0, 0.84], anchor: 'y2', matches: 'x', showgrid: true, gridcolor: 'rgba(149, 179, 210, 0.16)', zerolinecolor: 'rgba(149, 179, 210, 0.22)', showticklabels: false },
+        yaxis2: { domain: [0.40, 0.54], title: 'VIX', gridcolor: 'rgba(149, 179, 210, 0.16)', zerolinecolor: 'rgba(149, 179, 210, 0.22)' },
+        xaxis3: { domain: [0, 0.84], anchor: 'y3', matches: 'x', showgrid: true, gridcolor: 'rgba(149, 179, 210, 0.16)', zerolinecolor: 'rgba(149, 179, 210, 0.22)', showticklabels: false },
+        yaxis3: { domain: [0.21, 0.35], title: 'RMDD (%)', gridcolor: 'rgba(149, 179, 210, 0.16)', zerolinecolor: 'rgba(149, 179, 210, 0.22)', ticksuffix: '%' },
+        xaxis4: { domain: [0, 0.84], anchor: 'y4', matches: 'x', range: chartRange, showgrid: true, gridcolor: 'rgba(149, 179, 210, 0.16)', zerolinecolor: 'rgba(149, 179, 210, 0.22)', rangeslider: { visible: true, thickness: 0.06, bgcolor: '#0d1a27', bordercolor: 'rgba(149, 179, 210, 0.28)' } },
+        yaxis4: { domain: [0.02, 0.16], title: 'SOX Return (%)', gridcolor: 'rgba(149, 179, 210, 0.16)', zerolinecolor: 'rgba(149, 179, 210, 0.22)', ticksuffix: '%' },
         shapes,
         annotations: [
-          { text: 'Apex Predator Strategy<br>Portfolio Value ($) & Buy Events', xref: 'paper', yref: 'paper', x: 0.42, y: 1.04, showarrow: false, font: { size: 24 } },
-          { text: 'VIX Index', xref: 'paper', yref: 'paper', x: 0.42, y: 0.56, showarrow: false, font: { size: 22 } },
-          { text: 'RMDD Zones', xref: 'paper', yref: 'paper', x: 0.42, y: 0.37, showarrow: false, font: { size: 22 } },
-          { text: 'SOX Cumulative Return', xref: 'paper', yref: 'paper', x: 0.42, y: 0.18, showarrow: false, font: { size: 22 } },
-          { text: 'Panic Threshold', xref: 'paper', yref: 'y2', x: 0.82, y: strategyConfig.vixPanicThreshold + 1.5, showarrow: false, font: { size: 14, color: '#2d3a5d' } },
+          { text: 'Apex Predator Strategy<br>Portfolio Value ($) & Buy Events', xref: 'paper', yref: 'paper', x: 0.42, y: 1.04, showarrow: false, font: { size: 24, color: '#f4fbff' } },
+          { text: 'VIX Index', xref: 'paper', yref: 'paper', x: 0.42, y: 0.56, showarrow: false, font: { size: 22, color: '#f4fbff' } },
+          { text: 'RMDD Zones', xref: 'paper', yref: 'paper', x: 0.42, y: 0.37, showarrow: false, font: { size: 22, color: '#f4fbff' } },
+          { text: 'SOX Cumulative Return', xref: 'paper', yref: 'paper', x: 0.42, y: 0.18, showarrow: false, font: { size: 22, color: '#f4fbff' } },
+          { text: 'Panic Threshold', xref: 'paper', yref: 'y2', x: 0.82, y: strategyConfig.vixPanicThreshold + 1.5, showarrow: false, font: { size: 14, color: '#ffd166' } },
         ],
       };
       return { traces, layout };
@@ -1352,9 +1352,9 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
         hovertemplate: 'RMDD: %{x}<br>持有期間: %{y}<br>平均報酬率: %{z:.2f}%<extra></extra>',
       };
       const sharedLayout = {
-        paper_bgcolor: 'white',
-        plot_bgcolor: 'white',
-        font: { family: 'Microsoft JhengHei, Noto Sans TC, Arial, sans-serif', color: '#4b5563', size: 13 },
+        paper_bgcolor: '#071019',
+        plot_bgcolor: '#0d1a27',
+        font: { family: 'Microsoft JhengHei, Noto Sans TC, Arial, sans-serif', color: '#c7d7e8', size: 13 },
         margin: { l: 58, r: 24, t: 54, b: 70 },
       };
       Plotly.react('parameterHeatmap', [heatmapTrace], {
@@ -1362,27 +1362,27 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
         margin: { l: 66, r: 82, t: 58, b: 82 },
         title: {
           text: '費半 SOX 報酬參數高原圖 (2D 俯視熱區)',
-          font: { size: 18, color: '#4b5563', family: 'Microsoft JhengHei, Noto Sans TC, Arial, sans-serif' },
+          font: { size: 18, color: '#f4fbff', family: 'Microsoft JhengHei, Noto Sans TC, Arial, sans-serif' },
           x: 0.5,
           xanchor: 'center',
         },
         xaxis: {
-          title: { text: 'X軸: RMDD 買進條件區間', font: { size: 14, color: '#4b5563' } },
+          title: { text: 'X軸: RMDD 買進條件區間', font: { size: 14, color: '#c7d7e8' } },
           tickangle: -45,
           categoryorder: 'array',
           categoryarray: data.bucketLabels,
           autorange: 'reversed',
-          tickfont: { size: 12, color: '#4b5563' },
-          gridcolor: 'rgba(229, 231, 235, 0.85)',
+          tickfont: { size: 12, color: '#c7d7e8' },
+          gridcolor: 'rgba(149, 179, 210, 0.16)',
           zeroline: false,
         },
         yaxis: {
-          title: { text: 'Y軸: 持有期間(月)', font: { size: 14, color: '#4b5563' } },
+          title: { text: 'Y軸: 持有期間(月)', font: { size: 14, color: '#c7d7e8' } },
           categoryorder: 'array',
           categoryarray: data.holdLabels,
           autorange: 'reversed',
-          tickfont: { size: 13, color: '#4b5563' },
-          gridcolor: 'rgba(229, 231, 235, 0.85)',
+          tickfont: { size: 13, color: '#c7d7e8' },
+          gridcolor: 'rgba(149, 179, 210, 0.16)',
           zeroline: false,
         },
       }, { responsive: true, displaylogo: false });
@@ -1396,18 +1396,19 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
         cmid: 0,
         cmin: -5,
         cmax: 65,
-        colorbar: { title: '平均報酬率 (%)', len: 0.72 },
-        contours: { z: { show: true, usecolormap: true, highlightcolor: '#263555', project: { z: true } } },
+        colorbar: { title: '平均報酬率 (%)', len: 0.72, tickfont: { color: '#c7d7e8' }, titlefont: { color: '#c7d7e8' } },
+        contours: { z: { show: true, usecolormap: true, highlightcolor: '#62e6ff', project: { z: true } } },
         hovertemplate: 'RMDD: %{x}<br>持有: %{y}<br>平均報酬率: %{z:.2f}%<extra></extra>',
       };
       Plotly.react('parameterSurface', [surfaceTrace], {
         ...sharedLayout,
-        title: { text: '費半 SOX 參數高原表面 (3D Surface)', font: { size: 16 } },
+        title: { text: '費半 SOX 參數高原表面 (3D Surface)', font: { size: 16, color: '#f4fbff' } },
         height: 470,
         scene: {
-          xaxis: { title: 'RMDD 回撤區間', tickangle: -45 },
-          yaxis: { title: '持有期間' },
-          zaxis: { title: '平均報酬率 (%)' },
+          bgcolor: '#0d1a27',
+          xaxis: { title: 'RMDD 回撤區間', tickangle: -45, color: '#c7d7e8', gridcolor: 'rgba(149, 179, 210, 0.22)', zerolinecolor: 'rgba(149, 179, 210, 0.22)' },
+          yaxis: { title: '持有期間', color: '#c7d7e8', gridcolor: 'rgba(149, 179, 210, 0.22)', zerolinecolor: 'rgba(149, 179, 210, 0.22)' },
+          zaxis: { title: '平均報酬率 (%)', color: '#c7d7e8', gridcolor: 'rgba(149, 179, 210, 0.22)', zerolinecolor: 'rgba(149, 179, 210, 0.22)' },
           camera: { eye: { x: 1.45, y: 1.45, z: 0.9 } },
         },
       }, { responsive: true, displaylogo: false, scrollZoom: true });
@@ -1416,7 +1417,7 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
         type: 'bar',
         x: data.bucketLabels,
         y: data.probabilities,
-        marker: { color: 'rgba(79, 105, 220, 0.75)', line: { color: '#263555', width: 1 } },
+        marker: { color: 'rgba(98, 230, 255, 0.78)', line: { color: '#071019', width: 1 } },
         text: data.probabilities.map(value => value ? `${value.toFixed(1)}%` : ''),
         textposition: 'outside',
         customdata: data.counts,
@@ -1425,9 +1426,9 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
       Plotly.react('rmddSampleDistribution', [barTrace], {
         ...sharedLayout,
         height: 380,
-        title: { text: '各 RMDD 回撤區間發生機率分布圖', font: { size: 16 } },
-        xaxis: { title: 'RMDD 買進條件區間', tickangle: -45 },
-        yaxis: { title: '發生機率（%）', gridcolor: '#e5ecf6', rangemode: 'tozero', ticksuffix: '%' },
+        title: { text: '各 RMDD 回撤區間發生機率分布圖', font: { size: 16, color: '#f4fbff' } },
+        xaxis: { title: 'RMDD 買進條件區間', tickangle: -45, gridcolor: 'rgba(149, 179, 210, 0.16)', zerolinecolor: 'rgba(149, 179, 210, 0.22)' },
+        yaxis: { title: '發生機率（%）', gridcolor: 'rgba(149, 179, 210, 0.16)', zerolinecolor: 'rgba(149, 179, 210, 0.22)', rangemode: 'tozero', ticksuffix: '%' },
       }, { responsive: true, displaylogo: false });
     }
 
@@ -1508,7 +1509,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
             "name": "Apex Predator",
             "x": js_list(curve.index),
             "y": js_list(curve["Strat_Val"]),
-            "line": {"color": "#3f6fb5", "width": 3},
+            "line": {"color": "#62e6ff", "width": 3.4},
             "hovertemplate": "%{x}<br>Apex Predator: $%{y:,.0f}<extra></extra>",
             "xaxis": "x",
             "yaxis": "y",
@@ -1519,21 +1520,21 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
             "name": "Pure DCA",
             "x": js_list(curve.index),
             "y": js_list(curve["DCA_Val"]),
-            "line": {"color": "#8a8a8a", "width": 2, "dash": "dash"},
+            "line": {"color": "#9db0c4", "width": 2, "dash": "dash"},
             "hovertemplate": "%{x}<br>Pure DCA: $%{y:,.0f}<extra></extra>",
             "xaxis": "x",
             "yaxis": "y",
         },
-        make_marker_trace(buys, "Fallback Buy", "#2f7d25", "circle", 8),
-        make_marker_trace(buys, "STD Level Buy", "#ef3b2c", "triangle-up", 10),
-        make_marker_trace(buys, "Sniper Shot", "#7b1fa2", "star", 14),
+        make_marker_trace(buys, "Fallback Buy", "#46e6a8", "circle", 8),
+        make_marker_trace(buys, "STD Level Buy", "#ff6b7a", "triangle-up", 10),
+        make_marker_trace(buys, "Sniper Shot", "#b38cff", "star", 14),
         {
             "type": "scatter",
             "mode": "lines",
             "name": "VIX",
             "x": js_list(curve.index),
             "y": js_list(curve["VIX"]),
-            "line": {"color": "#808080", "width": 1.6},
+            "line": {"color": "#ffd166", "width": 1.8},
             "hovertemplate": "%{x}<br>VIX: %{y:.2f}<extra></extra>",
             "xaxis": "x2",
             "yaxis": "y2",
@@ -1544,9 +1545,9 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
             "name": "RMDD",
             "x": js_list(curve.index),
             "y": js_list(curve["RMDD"] * 100),
-            "line": {"color": "#4b3cff", "width": 2.6},
+            "line": {"color": "#66a6ff", "width": 2.6},
             "fill": "tozeroy",
-            "fillcolor": "rgba(75, 60, 255, 0.14)",
+            "fillcolor": "rgba(102, 166, 255, 0.16)",
             "hovertemplate": "%{x}<br>RMDD: %{y:.2f}%<extra></extra>",
             "xaxis": "x3",
             "yaxis": "y3",
@@ -1557,7 +1558,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
             "name": "SOX Return",
             "x": js_list(curve.index),
             "y": js_list(curve["Cum_Ret"]),
-            "line": {"color": "#f59e0b", "width": 2},
+            "line": {"color": "#46e6a8", "width": 2},
             "hovertemplate": "%{x}<br>SOX Return: %{y:.2f}%<extra></extra>",
             "xaxis": "x4",
             "yaxis": "y4",
@@ -1565,7 +1566,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     ]
 
     shapes = [
-        {"type": "line", "xref": "paper", "x0": 0, "x1": 0.83, "yref": "y2", "y0": CONFIG["VIX_PANIC_THRESHOLD"], "y1": CONFIG["VIX_PANIC_THRESHOLD"], "line": {"color": "#7b1fa2", "width": 2, "dash": "dash"}},
+        {"type": "line", "xref": "paper", "x0": 0, "x1": 0.83, "yref": "y2", "y0": CONFIG["VIX_PANIC_THRESHOLD"], "y1": CONFIG["VIX_PANIC_THRESHOLD"], "line": {"color": "#b38cff", "width": 2, "dash": "dash"}},
     ]
     for setting in CONFIG["LEVEL_CONFIG"]:
         shapes.append(
@@ -1577,7 +1578,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
                 "yref": "y3",
                 "y0": setting["threshold"] * 100,
                 "y1": setting["threshold"] * 100,
-                "line": {"color": "#999999", "width": 1, "dash": "dot"},
+                "line": {"color": "rgba(199, 215, 232, 0.54)", "width": 1, "dash": "dot"},
             }
         )
     for setting in CONFIG["SNIPER_CONFIG"]:
@@ -1590,34 +1591,34 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
                 "yref": "y3",
                 "y0": setting["threshold"] * 100,
                 "y1": setting["threshold"] * 100,
-                "line": {"color": "#e11d48", "width": 1.5, "dash": "solid"},
+                "line": {"color": "#ff6b7a", "width": 1.5, "dash": "solid"},
             }
         )
 
     layout = {
         "title": {"text": "", "x": 0.02, "font": {"size": 28}},
-        "paper_bgcolor": "white",
-        "plot_bgcolor": "white",
-        "font": {"family": "Arial, Microsoft JhengHei, Noto Sans TC, sans-serif", "color": "#2d3a5d", "size": 14},
+        "paper_bgcolor": "#071019",
+        "plot_bgcolor": "#0d1a27",
+        "font": {"family": "Arial, Microsoft JhengHei, Noto Sans TC, sans-serif", "color": "#c7d7e8", "size": 14},
         "height": 1040,
         "margin": {"l": 74, "r": 230, "t": 82, "b": 70},
         "hovermode": "x unified",
-        "legend": {"x": 1.02, "y": 0.99, "xanchor": "left", "yanchor": "top", "font": {"size": 16}},
-        "xaxis": {"domain": [0, 0.84], "anchor": "y", "range": chart_range, "showgrid": True, "gridcolor": "#e5ecf6", "showticklabels": False},
-        "yaxis": {"domain": [0.60, 1.0], "title": "Portfolio Value ($)", "gridcolor": "#e5ecf6", "tickformat": "~s"},
-        "xaxis2": {"domain": [0, 0.84], "anchor": "y2", "matches": "x", "showgrid": True, "gridcolor": "#e5ecf6", "showticklabels": False},
-        "yaxis2": {"domain": [0.40, 0.54], "title": "VIX", "gridcolor": "#e5ecf6"},
-        "xaxis3": {"domain": [0, 0.84], "anchor": "y3", "matches": "x", "showgrid": True, "gridcolor": "#e5ecf6", "showticklabels": False},
-        "yaxis3": {"domain": [0.21, 0.35], "title": "RMDD (%)", "gridcolor": "#e5ecf6", "ticksuffix": "%"},
-        "xaxis4": {"domain": [0, 0.84], "anchor": "y4", "matches": "x", "range": chart_range, "showgrid": True, "gridcolor": "#e5ecf6", "rangeslider": {"visible": True, "thickness": 0.06}},
-        "yaxis4": {"domain": [0.02, 0.16], "title": "SOX Return (%)", "gridcolor": "#e5ecf6", "ticksuffix": "%"},
+        "legend": {"x": 1.02, "y": 0.99, "xanchor": "left", "yanchor": "top", "font": {"size": 16, "color": "#f4fbff"}, "bgcolor": "rgba(13, 26, 39, 0.72)", "bordercolor": "rgba(149, 179, 210, 0.22)", "borderwidth": 1},
+        "xaxis": {"domain": [0, 0.84], "anchor": "y", "range": chart_range, "showgrid": True, "gridcolor": "rgba(149, 179, 210, 0.16)", "zerolinecolor": "rgba(149, 179, 210, 0.22)", "showticklabels": False},
+        "yaxis": {"domain": [0.60, 1.0], "title": "Portfolio Value ($)", "gridcolor": "rgba(149, 179, 210, 0.16)", "zerolinecolor": "rgba(149, 179, 210, 0.22)", "tickformat": "~s"},
+        "xaxis2": {"domain": [0, 0.84], "anchor": "y2", "matches": "x", "showgrid": True, "gridcolor": "rgba(149, 179, 210, 0.16)", "zerolinecolor": "rgba(149, 179, 210, 0.22)", "showticklabels": False},
+        "yaxis2": {"domain": [0.40, 0.54], "title": "VIX", "gridcolor": "rgba(149, 179, 210, 0.16)", "zerolinecolor": "rgba(149, 179, 210, 0.22)"},
+        "xaxis3": {"domain": [0, 0.84], "anchor": "y3", "matches": "x", "showgrid": True, "gridcolor": "rgba(149, 179, 210, 0.16)", "zerolinecolor": "rgba(149, 179, 210, 0.22)", "showticklabels": False},
+        "yaxis3": {"domain": [0.21, 0.35], "title": "RMDD (%)", "gridcolor": "rgba(149, 179, 210, 0.16)", "zerolinecolor": "rgba(149, 179, 210, 0.22)", "ticksuffix": "%"},
+        "xaxis4": {"domain": [0, 0.84], "anchor": "y4", "matches": "x", "range": chart_range, "showgrid": True, "gridcolor": "rgba(149, 179, 210, 0.16)", "zerolinecolor": "rgba(149, 179, 210, 0.22)", "rangeslider": {"visible": True, "thickness": 0.06, "bgcolor": "#0d1a27", "bordercolor": "rgba(149, 179, 210, 0.28)"}},
+        "yaxis4": {"domain": [0.02, 0.16], "title": "SOX Return (%)", "gridcolor": "rgba(149, 179, 210, 0.16)", "zerolinecolor": "rgba(149, 179, 210, 0.22)", "ticksuffix": "%"},
         "shapes": shapes,
         "annotations": [
-            {"text": "Apex Predator Strategy<br>Portfolio Value ($) & Buy Events", "xref": "paper", "yref": "paper", "x": 0.42, "y": 1.04, "showarrow": False, "font": {"size": 24}},
-            {"text": "VIX Index", "xref": "paper", "yref": "paper", "x": 0.42, "y": 0.56, "showarrow": False, "font": {"size": 22}},
-            {"text": "RMDD Zones", "xref": "paper", "yref": "paper", "x": 0.42, "y": 0.37, "showarrow": False, "font": {"size": 22}},
-            {"text": "SOX Cumulative Return", "xref": "paper", "yref": "paper", "x": 0.42, "y": 0.18, "showarrow": False, "font": {"size": 22}},
-            {"text": "Panic Threshold", "xref": "paper", "yref": "y2", "x": 0.82, "y": CONFIG["VIX_PANIC_THRESHOLD"] + 1.5, "showarrow": False, "font": {"size": 14, "color": "#2d3a5d"}},
+            {"text": "Apex Predator Strategy<br>Portfolio Value ($) & Buy Events", "xref": "paper", "yref": "paper", "x": 0.42, "y": 1.04, "showarrow": False, "font": {"size": 24, "color": "#f4fbff"}},
+            {"text": "VIX Index", "xref": "paper", "yref": "paper", "x": 0.42, "y": 0.56, "showarrow": False, "font": {"size": 22, "color": "#f4fbff"}},
+            {"text": "RMDD Zones", "xref": "paper", "yref": "paper", "x": 0.42, "y": 0.37, "showarrow": False, "font": {"size": 22, "color": "#f4fbff"}},
+            {"text": "SOX Cumulative Return", "xref": "paper", "yref": "paper", "x": 0.42, "y": 0.18, "showarrow": False, "font": {"size": 22, "color": "#f4fbff"}},
+            {"text": "Panic Threshold", "xref": "paper", "yref": "y2", "x": 0.82, "y": CONFIG["VIX_PANIC_THRESHOLD"] + 1.5, "showarrow": False, "font": {"size": 14, "color": "#ffd166"}},
         ],
     }
 
@@ -1826,138 +1827,160 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="site.webmanifest">
-  <meta name="theme-color" content="#263555">
+  <meta name="theme-color" content="#071019">
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
   <style>
     * {{ box-sizing: border-box; }}
-    body {{ margin: 0; font-family: Arial, 'Microsoft JhengHei', 'Noto Sans TC', sans-serif; background: #f4f7fb; color: #263555; }}
-    .report-hero {{ padding: 52px 28px 30px; background: linear-gradient(180deg, #ffffff 0%, #f7faff 100%); border-bottom: 1px solid #dfe7f2; }}
-    .hero-inner {{ display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr); gap: 32px; align-items: end; max-width: 1180px; margin: 0 auto; }}
-    .report-kicker {{ display: inline-block; margin-bottom: 12px; color: #3f6fb5; font-size: 12px; font-weight: 700; letter-spacing: 0; }}
-    h1 {{ margin: 0; color: #182640; font-size: 44px; line-height: 1.05; letter-spacing: 0; }}
-    .hero-copy p {{ max-width: 680px; margin: 18px 0 0; color: #475569; font-size: 18px; line-height: 1.75; }}
-    .hero-meta {{ display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; color: #64748b; font-size: 13px; }}
-    .hero-meta span {{ padding: 7px 10px; background: #eef4ff; border: 1px solid #dbe6f5; border-radius: 6px; }}
-    .subtitle {{ color: #315f9f; font-weight: 700; }}
+    :root {{
+      --bg: #071019;
+      --panel: #0d1a27;
+      --panel-2: #112235;
+      --panel-3: #14283d;
+      --line: rgba(149, 179, 210, 0.22);
+      --line-strong: rgba(116, 232, 255, 0.46);
+      --text: #f4fbff;
+      --muted: #9db0c4;
+      --soft: #c7d7e8;
+      --cyan: #62e6ff;
+      --blue: #66a6ff;
+      --amber: #ffd166;
+      --green: #46e6a8;
+      --red: #ff6b7a;
+      --purple: #b38cff;
+    }}
+    * {{ box-sizing: border-box; }}
+    body {{ margin: 0; font-family: Arial, 'Microsoft JhengHei', 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); }}
+    body::before {{ content: ""; position: fixed; inset: 0; z-index: -1; background: linear-gradient(118deg, rgba(98, 230, 255, 0.14) 0%, transparent 28%, rgba(255, 209, 102, 0.08) 62%, transparent 100%), linear-gradient(180deg, #071019 0%, #091827 48%, #071019 100%); }}
+    .report-hero {{ position: relative; overflow: hidden; padding: 68px 28px 42px; background: linear-gradient(135deg, rgba(7, 16, 25, 0.92), rgba(11, 31, 48, 0.94)); border-bottom: 1px solid var(--line); }}
+    .report-hero::after {{ content: ""; position: absolute; inset: auto 0 0; height: 1px; background: linear-gradient(90deg, transparent, var(--cyan), var(--amber), transparent); opacity: 0.85; }}
+    .hero-inner {{ position: relative; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(380px, 0.95fr); gap: 36px; align-items: end; max-width: 1180px; margin: 0 auto; }}
+    .report-kicker {{ display: inline-block; margin-bottom: 14px; color: var(--cyan); font-size: 12px; font-weight: 700; letter-spacing: 0; text-transform: uppercase; }}
+    h1 {{ margin: 0; color: var(--text); font-size: 58px; line-height: 0.98; letter-spacing: 0; }}
+    .hero-copy p {{ max-width: 690px; margin: 22px 0 0; color: var(--soft); font-size: 20px; line-height: 1.7; }}
+    .hero-meta {{ display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; color: var(--muted); font-size: 13px; }}
+    .hero-meta span {{ padding: 8px 11px; background: rgba(13, 26, 39, 0.86); border: 1px solid var(--line); border-radius: 6px; }}
+    .subtitle {{ color: var(--cyan); font-weight: 700; }}
     .hero-stats {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }}
-    .hero-stat {{ min-height: 104px; padding: 16px; background: white; border: 1px solid #dbe6f5; border-radius: 8px; box-shadow: 0 10px 30px rgba(38, 53, 85, 0.06); }}
-    .hero-stat span {{ display: block; color: #64748b; font-size: 12px; font-weight: 700; text-transform: uppercase; }}
-    .hero-stat b {{ display: block; margin-top: 13px; color: #172554; font-size: 25px; line-height: 1.1; font-variant-numeric: tabular-nums; }}
-    .strategy-thesis {{ display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 22px; max-width: 1180px; margin: 26px auto 0; padding: 0 28px; }}
-    .thesis-copy h2 {{ margin: 4px 0 10px; color: #1e2d48; font-size: 28px; line-height: 1.25; }}
-    .thesis-copy p {{ margin: 0; color: #64748b; font-size: 15px; line-height: 1.8; }}
+    .hero-stat {{ min-height: 118px; padding: 18px; background: linear-gradient(180deg, rgba(20, 40, 61, 0.92), rgba(10, 24, 37, 0.92)); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 18px 50px rgba(0, 0, 0, 0.32); }}
+    .hero-stat:nth-child(1), .hero-stat:nth-child(3) {{ border-color: rgba(98, 230, 255, 0.34); }}
+    .hero-stat span {{ display: block; color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase; }}
+    .hero-stat b {{ display: block; margin-top: 15px; color: var(--text); font-size: 28px; line-height: 1.05; font-variant-numeric: tabular-nums; }}
+    .hero-stat:nth-child(1) b, .hero-stat:nth-child(3) b {{ color: var(--cyan); }}
+    .strategy-thesis {{ display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 24px; max-width: 1180px; margin: 30px auto 0; padding: 0 28px; }}
+    .thesis-copy h2 {{ margin: 4px 0 12px; color: var(--text); font-size: 34px; line-height: 1.18; }}
+    .thesis-copy p {{ margin: 0; color: var(--soft); font-size: 15px; line-height: 1.85; }}
     .factor-grid {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }}
-    .factor-card {{ min-height: 150px; padding: 18px; background: white; border: 1px solid #dfe7f2; border-radius: 8px; }}
-    .factor-card span {{ color: #94a3b8; font-size: 12px; font-weight: 700; }}
-    .factor-card h3 {{ margin: 18px 0 8px; color: #172554; font-size: 20px; }}
-    .factor-card p {{ margin: 0; color: #64748b; font-size: 14px; line-height: 1.65; }}
+    .factor-card {{ min-height: 166px; padding: 20px; background: linear-gradient(180deg, rgba(17, 34, 53, 0.98), rgba(10, 22, 35, 0.98)); border: 1px solid var(--line); border-radius: 8px; }}
+    .factor-card span {{ color: var(--amber); font-size: 12px; font-weight: 700; }}
+    .factor-card h3 {{ margin: 24px 0 10px; color: var(--text); font-size: 22px; }}
+    .factor-card p {{ margin: 0; color: var(--soft); font-size: 14px; line-height: 1.7; }}
     .date-controls {{ max-width: 1180px; margin: 0 auto; padding: 18px 28px 0; }}
-    .date-panel {{ display: flex; align-items: end; gap: 12px; flex-wrap: wrap; background: white; border: 1px solid #e1e8f3; border-radius: 8px; padding: 12px 14px; }}
-    .date-panel label {{ display: grid; gap: 5px; color: #64748b; font-size: 12px; }}
-    .date-panel input {{ height: 34px; min-width: 150px; border: 1px solid #dbe3ef; border-radius: 6px; padding: 0 10px; color: #263555; font: inherit; font-size: 14px; background: #fbfdff; }}
-    .date-panel button {{ height: 36px; border: 1px solid #dbe3ef; border-radius: 6px; padding: 0 14px; color: #263555; background: #eef4ff; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }}
-    .date-panel button.secondary {{ background: white; color: #64748b; }}
-    .date-status {{ margin-left: auto; color: #64748b; font-size: 12px; }}
+    .date-panel {{ display: flex; align-items: end; gap: 12px; flex-wrap: wrap; background: rgba(13, 26, 39, 0.92); border: 1px solid var(--line); border-radius: 8px; padding: 14px; }}
+    .date-panel label {{ display: grid; gap: 6px; color: var(--muted); font-size: 12px; }}
+    .date-panel input {{ height: 36px; min-width: 150px; border: 1px solid var(--line); border-radius: 6px; padding: 0 10px; color: var(--text); font: inherit; font-size: 14px; background: rgba(7, 16, 25, 0.9); }}
+    .date-panel button {{ height: 36px; border: 1px solid rgba(98, 230, 255, 0.42); border-radius: 6px; padding: 0 14px; color: #031018; background: var(--cyan); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }}
+    .date-panel button.secondary {{ background: transparent; color: var(--soft); border-color: var(--line); }}
+    .date-status {{ margin-left: auto; color: var(--muted); font-size: 12px; }}
     .cards {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; max-width: 1180px; margin: 0 auto; padding: 16px 28px 0; }}
-    .card {{ background: white; border: 1px solid #e1e8f3; border-radius: 8px; padding: 14px 16px; }}
-    .card span {{ display: block; color: #64748b; font-size: 13px; margin-bottom: 6px; }}
-    .card b {{ font-size: 20px; }}
+    .card {{ background: rgba(13, 26, 39, 0.92); border: 1px solid var(--line); border-radius: 8px; padding: 16px; }}
+    .card span {{ display: block; color: var(--muted); font-size: 13px; margin-bottom: 7px; }}
+    .card b {{ color: var(--text); font-size: 22px; }}
     .performance {{ max-width: 1180px; margin: 22px auto 4px; padding: 0 28px; }}
     .signal-grid {{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin-bottom: 16px; }}
-    .signal-card {{ position: relative; min-height: 168px; background: white; border: 1px solid #e1e8f3; border-radius: 8px; padding: 24px 28px; overflow: hidden; }}
-    .signal-card.active::before {{ content: ""; position: absolute; inset: 0 auto 0 0; width: 9px; background: #c73d3d; }}
-    .signal-card.quiet::before {{ content: ""; position: absolute; inset: 0 auto 0 0; width: 9px; background: #315f9f; }}
-    .signal-pill {{ display: inline-flex; align-items: center; min-height: 30px; padding: 0 14px; border-radius: 999px; background: #f8dfdf; color: #8b1f1f; font-size: 15px; font-weight: 700; }}
-    .signal-card.quiet .signal-pill {{ background: #eaf1fb; color: #315f9f; }}
-    .signal-card h3 {{ margin: 28px 0 12px; color: #0f1f35; font-size: 24px; line-height: 1.2; letter-spacing: 0; }}
+    .signal-card {{ position: relative; min-height: 176px; background: rgba(13, 26, 39, 0.94); border: 1px solid var(--line); border-radius: 8px; padding: 26px 28px; overflow: hidden; }}
+    .signal-card.active::before {{ content: ""; position: absolute; inset: 0 auto 0 0; width: 8px; background: var(--amber); }}
+    .signal-card.quiet::before {{ content: ""; position: absolute; inset: 0 auto 0 0; width: 8px; background: var(--cyan); }}
+    .signal-pill {{ display: inline-flex; align-items: center; min-height: 30px; padding: 0 14px; border-radius: 999px; background: rgba(255, 209, 102, 0.14); color: var(--amber); font-size: 15px; font-weight: 700; }}
+    .signal-card.quiet .signal-pill {{ background: rgba(98, 230, 255, 0.12); color: var(--cyan); }}
+    .signal-card h3 {{ margin: 28px 0 12px; color: var(--text); font-size: 26px; line-height: 1.2; letter-spacing: 0; }}
     .signal-card.expectation h3 {{ margin-top: 4px; font-size: 24px; }}
     .signal-list {{ display: grid; gap: 7px; margin: 0; padding: 0; list-style: none; }}
-    .signal-list li {{ display: grid; grid-template-columns: 86px minmax(0, 1fr) auto; gap: 10px; align-items: center; color: #263555; font-size: 14px; }}
-    .signal-list li b {{ color: #64748b; font-size: 12px; font-weight: 700; }}
+    .signal-list li {{ display: grid; grid-template-columns: 86px minmax(0, 1fr) auto; gap: 10px; align-items: center; color: var(--soft); font-size: 14px; }}
+    .signal-list li b {{ color: var(--muted); font-size: 12px; font-weight: 700; }}
     .signal-list li span {{ min-width: 0; line-height: 1.4; }}
-    .signal-list li strong {{ color: #0f1f35; font-size: 15px; font-variant-numeric: tabular-nums; }}
+    .signal-list li strong {{ color: var(--text); font-size: 15px; font-variant-numeric: tabular-nums; }}
     .expectation-lines {{ display: grid; gap: 13px; margin-top: 28px; }}
-    .expectation-lines p {{ margin: 0; color: #0f1f35; font-size: 18px; line-height: 1.35; }}
+    .expectation-lines p {{ margin: 0; color: var(--text); font-size: 18px; line-height: 1.35; }}
     .expectation-lines b {{ font-weight: 700; }}
     .section-heading {{ display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 12px; }}
-    .section-heading h2 {{ margin: 3px 0 0; font-size: 23px; color: #263555; }}
-    .eyebrow {{ color: #3f6fb5; font-size: 12px; font-weight: 700; letter-spacing: 0; }}
-    .period {{ color: #475569; font-size: 14px; text-align: right; }}
-    .period span {{ display: block; margin-top: 3px; color: #8491a5; font-size: 12px; }}
+    .section-heading h2 {{ margin: 3px 0 0; font-size: 25px; color: var(--text); }}
+    .eyebrow {{ color: var(--cyan); font-size: 12px; font-weight: 700; letter-spacing: 0; }}
+    .period {{ color: var(--soft); font-size: 14px; text-align: right; }}
+    .period span {{ display: block; margin-top: 3px; color: var(--muted); font-size: 12px; }}
     .performance-grid {{ display: grid; grid-template-columns: minmax(0, 2.25fr) minmax(240px, 0.75fr); gap: 12px; }}
-    .comparison, .trade-summary {{ background: white; border: 1px solid #e1e8f3; border-radius: 8px; overflow: hidden; }}
+    .comparison, .trade-summary {{ background: rgba(13, 26, 39, 0.94); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }}
     .comparison-head, .comparison-row {{ display: grid; grid-template-columns: minmax(140px, 1.15fr) minmax(130px, 1fr) minmax(130px, 1fr) minmax(100px, 0.75fr); align-items: center; column-gap: 16px; padding: 11px 16px; }}
-    .comparison-head {{ background: #eef4ff; color: #263555; font-size: 13px; }}
+    .comparison-head {{ background: rgba(98, 230, 255, 0.09); color: var(--soft); font-size: 13px; }}
     .comparison-head strong {{ font-size: 14px; }}
-    .comparison-row {{ min-height: 26px; border-top: 1px solid #edf1f7; font-size: 14px; }}
-    .comparison-row > span:first-child {{ color: #64748b; }}
-    .comparison-row b {{ color: #24324e; font-size: 15px; font-variant-numeric: tabular-nums; }}
-    .comparison-row.emphasis {{ background: #fafcff; }}
-    .comparison-row.emphasis b {{ font-size: 18px; color: #315f9f; }}
-    .comparison-row.return-divider {{ border-top: 2px solid #dbe6f5; }}
-    .comparison-row .diff-positive {{ color: #c83f31; }}
-    .comparison-row .diff-negative {{ color: #16805a; }}
-    .comparison-row .diff-neutral {{ color: #24324e; font-size: 15px; font-weight: 700; font-family: inherit; font-variant-numeric: tabular-nums; }}
-    .comparison-footnote {{ padding: 9px 16px 11px; border-top: 1px solid #edf1f7; color: #8491a5; font-size: 11px; line-height: 1.5; }}
+    .comparison-row {{ min-height: 28px; border-top: 1px solid rgba(149, 179, 210, 0.14); font-size: 14px; }}
+    .comparison-row > span:first-child {{ color: var(--muted); }}
+    .comparison-row b {{ color: var(--text); font-size: 15px; font-variant-numeric: tabular-nums; }}
+    .comparison-row.emphasis {{ background: rgba(98, 230, 255, 0.08); }}
+    .comparison-row.emphasis b {{ font-size: 18px; color: var(--cyan); }}
+    .comparison-row.return-divider {{ border-top: 2px solid rgba(98, 230, 255, 0.28); }}
+    .comparison-row .diff-positive {{ color: var(--red); }}
+    .comparison-row .diff-negative {{ color: var(--green); }}
+    .comparison-row .diff-neutral {{ color: var(--soft); font-size: 15px; font-weight: 700; font-family: inherit; font-variant-numeric: tabular-nums; }}
+    .comparison-footnote {{ padding: 10px 16px 12px; border-top: 1px solid rgba(149, 179, 210, 0.14); color: var(--muted); font-size: 11px; line-height: 1.5; }}
     .trade-summary {{ display: flex; flex-direction: column; padding: 16px; }}
-    .trade-title {{ color: #475569; font-size: 13px; font-weight: 700; }}
-    .trade-total {{ padding: 12px 0 14px; border-bottom: 1px solid #edf1f7; }}
+    .trade-title {{ color: var(--soft); font-size: 13px; font-weight: 700; }}
+    .trade-total {{ padding: 12px 0 14px; border-bottom: 1px solid rgba(149, 179, 210, 0.14); }}
     .trade-total > div {{ display: flex; align-items: baseline; gap: 7px; min-width: 0; }}
-    .trade-total b {{ font-size: 30px; color: #263555; }}
-    .trade-total span {{ color: #64748b; font-size: 12px; }}
+    .trade-total b {{ font-size: 34px; color: var(--cyan); }}
+    .trade-total span {{ color: var(--muted); font-size: 12px; }}
     .trade-list {{ padding: 8px 0; }}
-    .trade-list div {{ display: grid; grid-template-columns: 12px minmax(82px, 1fr) 38px; align-items: center; gap: 7px; min-height: 30px; color: #475569; font-size: 14px; }}
-    .trade-list .trade-list-head {{ min-height: 20px; color: #94a3b8; font-size: 10px; text-align: right; }}
+    .trade-list div {{ display: grid; grid-template-columns: 12px minmax(82px, 1fr) 38px; align-items: center; gap: 7px; min-height: 30px; color: var(--soft); font-size: 14px; }}
+    .trade-list .trade-list-head {{ min-height: 20px; color: var(--muted); font-size: 10px; text-align: right; }}
     .trade-list small {{ font-size: 10px; font-weight: 400; }}
     .trade-list i {{ width: 8px; height: 8px; border-radius: 50%; }}
-    .fallback-dot {{ background: #2f7d25; }}
-    .standard-dot {{ background: #ef3b2c; }}
-    .sniper-dot {{ background: #7b1fa2; }}
-    .trade-list b {{ color: #263555; font-size: 15px; text-align: right; }}
-    .trade-list em {{ color: #315f9f; font-size: 13px; font-style: normal; font-weight: 700; text-align: right; }}
-    .trade-summary p {{ margin: 6px 0 0; color: #8491a5; font-size: 12px; line-height: 1.55; }}
-    .annual-section {{ margin-top: 30px; padding-top: 14px; border-top: 1px solid #edf1f7; }}
-    .annual-total {{ display: inline-flex; align-items: baseline; gap: 6px; margin: 9px 0 8px; padding: 7px 9px; background: #f3f6fc; }}
-    .annual-total b {{ color: #315f9f; font-size: 30px; line-height: 1; }}
-    .annual-total span {{ color: #64748b; font-size: 12px; }}
-    .annual-list {{ padding-bottom: 0; border-top: 1px solid #edf1f7; }}
+    .fallback-dot {{ background: var(--green); }}
+    .standard-dot {{ background: var(--red); }}
+    .sniper-dot {{ background: var(--purple); }}
+    .trade-list b {{ color: var(--text); font-size: 15px; text-align: right; }}
+    .trade-list em {{ color: var(--cyan); font-size: 13px; font-style: normal; font-weight: 700; text-align: right; }}
+    .trade-summary p {{ margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }}
+    .annual-section {{ margin-top: 30px; padding-top: 14px; border-top: 1px solid rgba(149, 179, 210, 0.14); }}
+    .annual-total {{ display: inline-flex; align-items: baseline; gap: 6px; margin: 9px 0 8px; padding: 7px 9px; background: rgba(98, 230, 255, 0.09); }}
+    .annual-total b {{ color: var(--cyan); font-size: 30px; line-height: 1; }}
+    .annual-total span {{ color: var(--muted); font-size: 12px; }}
+    .annual-list {{ padding-bottom: 0; border-top: 1px solid rgba(149, 179, 210, 0.14); }}
     #chart {{ width: min(1280px, 100vw); height: 1040px; margin: 4px auto 0; }}
-    .note {{ max-width: 1180px; margin: 0 auto 28px; padding: 0 28px; color: #64748b; font-size: 13px; }}
+    .note {{ max-width: 1180px; margin: 0 auto 28px; padding: 0 28px; color: var(--muted); font-size: 13px; }}
     .rules {{ max-width: 1180px; margin: 0 auto 34px; padding: 0 28px; }}
-    .rules h2 {{ margin: 0 0 8px; font-size: 24px; color: #263555; }}
-    .rule-help {{ margin: 0 0 12px; color: #64748b; font-size: 14px; }}
-    .rule-scroll {{ overflow-x: auto; background: white; border: 1px solid #e1e8f3; border-radius: 8px; }}
+    .rules h2 {{ margin: 0 0 8px; font-size: 24px; color: var(--text); }}
+    .rule-help {{ margin: 0 0 12px; color: var(--muted); font-size: 14px; }}
+    .rule-scroll {{ overflow-x: auto; background: rgba(13, 26, 39, 0.94); border: 1px solid var(--line); border-radius: 8px; }}
     .rule-table {{ width: 100%; border-collapse: collapse; min-width: 1040px; table-layout: fixed; font-size: 14px; }}
-    .rule-table th, .rule-table td {{ padding: 7px 7px; border-right: 1px solid #dfe5ee; border-bottom: 1px solid #dfe5ee; text-align: left; vertical-align: middle; }}
-    .rule-table thead th {{ background: #eef4ff; color: #263555; font-size: 15px; }}
-    .rule-table thead .rule-group-head th {{ text-align: center; vertical-align: middle; border-right: 1px solid #dbe3ef; }}
-    .rule-table thead .rule-group-head th:last-child {{ text-align: left; border-left: 1px solid #dfe5ee; border-right: 0; }}
+    .rule-table th, .rule-table td {{ padding: 7px 7px; border-right: 1px solid rgba(149, 179, 210, 0.18); border-bottom: 1px solid rgba(149, 179, 210, 0.18); text-align: left; vertical-align: middle; }}
+    .rule-table thead th {{ background: rgba(98, 230, 255, 0.1); color: var(--text); font-size: 15px; }}
+    .rule-table thead .rule-group-head th {{ text-align: center; vertical-align: middle; border-right: 1px solid rgba(149, 179, 210, 0.18); }}
+    .rule-table thead .rule-group-head th:last-child {{ text-align: left; border-left: 1px solid rgba(149, 179, 210, 0.18); border-right: 0; }}
     .rule-table thead .rule-group-head th {{ height: 54px; }}
-    .rule-table thead .rule-subhead th {{ height: 28px; padding-top: 4px; padding-bottom: 4px; text-align: center; background: #f5f8fd; border-right: 1px solid #e1e8f3; }}
+    .rule-table thead .rule-subhead th {{ height: 28px; padding-top: 4px; padding-bottom: 4px; text-align: center; background: rgba(20, 40, 61, 0.92); border-right: 1px solid rgba(149, 179, 210, 0.18); }}
     .rule-table .rmdd-col {{ width: 17%; }}
     .rule-table .rule-col {{ width: 15%; }}
     .rule-table .amount-col {{ width: 10.5%; }}
     .rule-table .note-col {{ width: 32%; }}
-    .rule-table tbody th {{ background: #f8fafc; color: #1f2937; font-weight: 700; text-align: center; vertical-align: middle; line-height: 1.3; }}
+    .rule-table tbody th {{ background: rgba(20, 40, 61, 0.72); color: var(--text); font-weight: 700; text-align: center; vertical-align: middle; line-height: 1.3; }}
     .rule-table tbody td {{ height: 22px; line-height: 1.3; }}
-    .rule-table .rule-cell {{ color: #334155; }}
-    .rule-table .amount-cell {{ color: #172554; font-weight: 700; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }}
+    .rule-table .rule-cell {{ color: var(--soft); }}
+    .rule-table .amount-cell {{ color: var(--cyan); font-weight: 700; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }}
     .rule-table .grouped-cell {{ vertical-align: middle; }}
-    .rule-table .note-cell {{ border-left: 1px solid #dfe5ee; color: #334155; line-height: 1.35; }}
-    .rule-table span {{ color: #64748b; font-weight: 400; font-size: 14px; }}
+    .rule-table .note-cell {{ border-left: 1px solid rgba(149, 179, 210, 0.18); color: var(--soft); line-height: 1.35; }}
+    .rule-table span {{ color: var(--muted); font-weight: 400; font-size: 14px; }}
     .rule-table th:last-child, .rule-table td:last-child {{ border-right: 0; }}
     .rule-table tr:last-child th, .rule-table tr:last-child td {{ border-bottom: 0; }}
     .parameter-analysis {{ max-width: 1180px; margin: 0 auto 42px; padding: 0 28px; }}
-    .parameter-analysis h2 {{ margin: 0 0 8px; font-size: 24px; color: #263555; }}
-    .parameter-help {{ margin: 0 0 12px; color: #64748b; font-size: 14px; }}
+    .parameter-analysis h2 {{ margin: 0 0 8px; font-size: 24px; color: var(--text); }}
+    .parameter-help {{ margin: 0 0 12px; color: var(--muted); font-size: 14px; }}
     .parameter-grid {{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }}
-    .parameter-chart {{ min-height: 470px; background: white; border: 1px solid #e1e8f3; border-radius: 8px; overflow: hidden; }}
+    .parameter-chart {{ min-height: 470px; background: rgba(13, 26, 39, 0.94); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }}
     .parameter-chart.wide {{ grid-column: 1 / -1; min-height: 380px; }}
-    .strategy-details {{ margin-top: 10px; padding: 34px 28px 46px; background: white; border-top: 1px solid #dfe7f2; }}
+    .strategy-details {{ margin-top: 10px; padding: 38px 28px 50px; background: #09131f; border-top: 1px solid var(--line); }}
     .details-inner {{ max-width: 900px; margin: 0 auto; }}
-    .strategy-details h2 {{ margin: 4px 0 14px; color: #263555; font-size: 24px; }}
-    .strategy-details p {{ margin: 0 0 9px; color: #475569; font-size: 15px; line-height: 1.8; }}
-    .strategy-details b {{ color: #172554; }}
+    .strategy-details h2 {{ margin: 4px 0 14px; color: var(--text); font-size: 24px; }}
+    .strategy-details p {{ margin: 0 0 9px; color: var(--soft); font-size: 15px; line-height: 1.8; }}
+    .strategy-details b {{ color: var(--cyan); }}
     @media (max-width: 900px) {{
       .report-hero {{ padding: 34px 18px 24px; }}
       .hero-inner {{ grid-template-columns: 1fr; gap: 18px; }}

@@ -4,8 +4,8 @@
   "description": "Apex Predator Strategy dashboard",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f6f8fb",
-  "theme_color": "#263555",
+  "background_color": "#071019",
+  "theme_color": "#071019",
   "icons": [
     {
       "src": "assets/icon-192.png",
