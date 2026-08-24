@@ -1027,6 +1027,10 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
       const sniperCount = result.buys.filter(buy => buy.Type === 'Sniper Shot').length;
       const monthHasBuy = result.buys.some(buy => buy.Date.slice(0, 7) === m.finalDate.slice(0, 7));
       document.querySelector('.subtitle').textContent = `最新資料日：${m.finalDate}`;
+      document.querySelector('#heroFinalValue').textContent = money(m.finalValStrat);
+      document.querySelector('#heroCost').textContent = money(m.costStrat);
+      document.querySelector('#heroXirr').textContent = pct(m.xirrStrat);
+      document.querySelector('#heroBuyCount').textContent = intFmt.format(result.buys.length);
 
       document.querySelector('.performance').innerHTML = `
         ${renderSignalPanels(result)}
@@ -1654,6 +1658,76 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     fallback_count = int((buys["Type"] == "Fallback Buy").sum())
     standard_count = int((buys["Type"] == "STD Level Buy").sum())
     sniper_count = int((buys["Type"] == "Sniper Shot").sum())
+    report_summary = f"""
+  <header class="report-hero">
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <span class="report-kicker">SOX 回測研究報告</span>
+        <h1>Apex Predator Strategy</h1>
+        <p>這是一套以 SOX 為標的、根據市場回撤與恐慌程度動態加碼的長期投資策略。</p>
+        <div class="hero-meta">
+          <span class="subtitle">{subtitle}</span>
+          <span>{start_date.date()} 至 {metrics['final_date'].date()}</span>
+          <span>約 {years:.1f} 年</span>
+        </div>
+      </div>
+      <div class="hero-stats" aria-label="核心績效數字">
+        <div class="hero-stat">
+          <span>Final Portfolio</span>
+          <b id="heroFinalValue">{money(metrics['final_val_strat'])}</b>
+        </div>
+        <div class="hero-stat">
+          <span>Total Invested</span>
+          <b id="heroCost">{money(metrics['cost_strat'])}</b>
+        </div>
+        <div class="hero-stat">
+          <span>Annualized XIRR</span>
+          <b id="heroXirr">{pct(metrics['xirr_strat'])}</b>
+        </div>
+        <div class="hero-stat">
+          <span>Buy Events</span>
+          <b id="heroBuyCount">{len(buys):,}</b>
+        </div>
+      </div>
+    </div>
+  </header>
+  <section class="strategy-thesis">
+    <div class="thesis-copy">
+      <span class="eyebrow">策略邏輯</span>
+      <h2>用回撤決定加碼節奏，用恐慌辨識狙擊時點。</h2>
+      <p>這份 Dashboard 把策略績效、買入事件與市場狀態放在同一張互動圖表中，方便快速比較 Apex Predator 與純定期定額的長期結果。</p>
+    </div>
+    <div class="factor-grid">
+      <article class="factor-card">
+        <span>01</span>
+        <h3>RMDD</h3>
+        <p>跌破預設回撤防線時，啟動標準加碼。</p>
+      </article>
+      <article class="factor-card">
+        <span>02</span>
+        <h3>VIX</h3>
+        <p>市場進入恐慌區時，搭配深層回撤觸發狙擊買入。</p>
+      </article>
+      <article class="factor-card">
+        <span>03</span>
+        <h3>Seasonality</h3>
+        <p>10 月保底買入提高至 1.5 份，反映季節性回落特徵。</p>
+      </article>
+    </div>
+  </section>
+"""
+    strategy_details = """
+  <section class="strategy-details">
+    <div class="details-inner">
+      <span class="eyebrow">策略詳細說明</span>
+      <h2>Apex Predator 策略架構</h2>
+      <p>Apex Predator 是一套改良版的 SOX 定期定額加碼策略（DCA），共有三大因子：</p>
+      <p><b>1) RMDD</b>－追蹤 SOX 指數 1 年交易日的高點的回撤，跌破設定的防線（Level）時啟動標準加碼（STD Level Buy）</p>
+      <p><b>2) S&amp;P500 恐慌指數 (VIX)</b>－判斷市場系統性恐慌程度，當 VIX 大於一定程度（市場很恐慌），且 RMDD 跌破深層防線時（且市場跌很深），將額外啟動狙擊加碼（Sniper Shot）</p>
+      <p><b>3) 季節效應</b>－根據歷史資料回測，發現 10 月股市的回落程度顯著，因此在該月月底的基礎加碼（Fallback buy）將上調至 1.5 份。</p>
+    </div>
+  </section>
+"""
     performance_summary = f"""
   <section class="performance">
     <div class="section-heading">
@@ -1748,33 +1822,47 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Strategy 12: Apex Predator Dashboard</title>
+  <title>Apex Predator Strategy</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="site.webmanifest">
   <meta name="theme-color" content="#263555">
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
   <style>
-    body {{ margin: 0; font-family: Arial, 'Microsoft JhengHei', 'Noto Sans TC', sans-serif; background: #f6f8fb; color: #263555; }}
-    header {{ padding: 18px 48px 8px; background: white; border-bottom: 1px solid #e5ecf6; }}
-    h1 {{ margin: 0 0 8px; font-size: 30px; }}
-    .strategy-intro {{ max-width: 1180px; margin: 0 0 10px; color: #475569; font-size: 14px; line-height: 1.7; }}
-    .strategy-intro p {{ margin: 0 0 4px; }}
-    .strategy-intro p:last-child {{ margin-bottom: 0; }}
-    .strategy-intro b {{ color: #263555; }}
-    .subtitle {{ color: #61708a; font-size: 14px; }}
-    .date-controls {{ max-width: 1180px; margin: 0 auto; padding: 16px 28px 0; }}
+    * {{ box-sizing: border-box; }}
+    body {{ margin: 0; font-family: Arial, 'Microsoft JhengHei', 'Noto Sans TC', sans-serif; background: #f4f7fb; color: #263555; }}
+    .report-hero {{ padding: 52px 28px 30px; background: linear-gradient(180deg, #ffffff 0%, #f7faff 100%); border-bottom: 1px solid #dfe7f2; }}
+    .hero-inner {{ display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr); gap: 32px; align-items: end; max-width: 1180px; margin: 0 auto; }}
+    .report-kicker {{ display: inline-block; margin-bottom: 12px; color: #3f6fb5; font-size: 12px; font-weight: 700; letter-spacing: 0; }}
+    h1 {{ margin: 0; color: #182640; font-size: 44px; line-height: 1.05; letter-spacing: 0; }}
+    .hero-copy p {{ max-width: 680px; margin: 18px 0 0; color: #475569; font-size: 18px; line-height: 1.75; }}
+    .hero-meta {{ display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; color: #64748b; font-size: 13px; }}
+    .hero-meta span {{ padding: 7px 10px; background: #eef4ff; border: 1px solid #dbe6f5; border-radius: 6px; }}
+    .subtitle {{ color: #315f9f; font-weight: 700; }}
+    .hero-stats {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }}
+    .hero-stat {{ min-height: 104px; padding: 16px; background: white; border: 1px solid #dbe6f5; border-radius: 8px; box-shadow: 0 10px 30px rgba(38, 53, 85, 0.06); }}
+    .hero-stat span {{ display: block; color: #64748b; font-size: 12px; font-weight: 700; text-transform: uppercase; }}
+    .hero-stat b {{ display: block; margin-top: 13px; color: #172554; font-size: 25px; line-height: 1.1; font-variant-numeric: tabular-nums; }}
+    .strategy-thesis {{ display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 22px; max-width: 1180px; margin: 26px auto 0; padding: 0 28px; }}
+    .thesis-copy h2 {{ margin: 4px 0 10px; color: #1e2d48; font-size: 28px; line-height: 1.25; }}
+    .thesis-copy p {{ margin: 0; color: #64748b; font-size: 15px; line-height: 1.8; }}
+    .factor-grid {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }}
+    .factor-card {{ min-height: 150px; padding: 18px; background: white; border: 1px solid #dfe7f2; border-radius: 8px; }}
+    .factor-card span {{ color: #94a3b8; font-size: 12px; font-weight: 700; }}
+    .factor-card h3 {{ margin: 18px 0 8px; color: #172554; font-size: 20px; }}
+    .factor-card p {{ margin: 0; color: #64748b; font-size: 14px; line-height: 1.65; }}
+    .date-controls {{ max-width: 1180px; margin: 0 auto; padding: 18px 28px 0; }}
     .date-panel {{ display: flex; align-items: end; gap: 12px; flex-wrap: wrap; background: white; border: 1px solid #e1e8f3; border-radius: 8px; padding: 12px 14px; }}
     .date-panel label {{ display: grid; gap: 5px; color: #64748b; font-size: 12px; }}
     .date-panel input {{ height: 34px; min-width: 150px; border: 1px solid #dbe3ef; border-radius: 6px; padding: 0 10px; color: #263555; font: inherit; font-size: 14px; background: #fbfdff; }}
     .date-panel button {{ height: 36px; border: 1px solid #dbe3ef; border-radius: 6px; padding: 0 14px; color: #263555; background: #eef4ff; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }}
     .date-panel button.secondary {{ background: white; color: #64748b; }}
     .date-status {{ margin-left: auto; color: #64748b; font-size: 12px; }}
-    .cards {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; max-width: 1180px; margin: 0 auto; padding: 18px 28px 0; }}
-    .card {{ background: white; border: 1px solid #e1e8f3; border-radius: 8px; padding: 12px 14px; }}
+    .cards {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; max-width: 1180px; margin: 0 auto; padding: 16px 28px 0; }}
+    .card {{ background: white; border: 1px solid #e1e8f3; border-radius: 8px; padding: 14px 16px; }}
     .card span {{ display: block; color: #64748b; font-size: 13px; margin-bottom: 6px; }}
     .card b {{ font-size: 20px; }}
-    .performance {{ max-width: 1180px; margin: 18px auto 4px; padding: 0 28px; }}
+    .performance {{ max-width: 1180px; margin: 22px auto 4px; padding: 0 28px; }}
     .signal-grid {{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin-bottom: 16px; }}
     .signal-card {{ position: relative; min-height: 168px; background: white; border: 1px solid #e1e8f3; border-radius: 8px; padding: 24px 28px; overflow: hidden; }}
     .signal-card.active::before {{ content: ""; position: absolute; inset: 0 auto 0 0; width: 9px; background: #c73d3d; }}
@@ -1833,7 +1921,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     .annual-total b {{ color: #315f9f; font-size: 30px; line-height: 1; }}
     .annual-total span {{ color: #64748b; font-size: 12px; }}
     .annual-list {{ padding-bottom: 0; border-top: 1px solid #edf1f7; }}
-    #chart {{ width: min(1280px, 100vw); height: 1040px; margin: 0 auto; }}
+    #chart {{ width: min(1280px, 100vw); height: 1040px; margin: 4px auto 0; }}
     .note {{ max-width: 1180px; margin: 0 auto 28px; padding: 0 28px; color: #64748b; font-size: 13px; }}
     .rules {{ max-width: 1180px; margin: 0 auto 34px; padding: 0 28px; }}
     .rules h2 {{ margin: 0 0 8px; font-size: 24px; color: #263555; }}
@@ -1865,7 +1953,17 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     .parameter-grid {{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }}
     .parameter-chart {{ min-height: 470px; background: white; border: 1px solid #e1e8f3; border-radius: 8px; overflow: hidden; }}
     .parameter-chart.wide {{ grid-column: 1 / -1; min-height: 380px; }}
+    .strategy-details {{ margin-top: 10px; padding: 34px 28px 46px; background: white; border-top: 1px solid #dfe7f2; }}
+    .details-inner {{ max-width: 900px; margin: 0 auto; }}
+    .strategy-details h2 {{ margin: 4px 0 14px; color: #263555; font-size: 24px; }}
+    .strategy-details p {{ margin: 0 0 9px; color: #475569; font-size: 15px; line-height: 1.8; }}
+    .strategy-details b {{ color: #172554; }}
     @media (max-width: 900px) {{
+      .report-hero {{ padding: 34px 18px 24px; }}
+      .hero-inner {{ grid-template-columns: 1fr; gap: 18px; }}
+      h1 {{ font-size: 36px; }}
+      .hero-copy p {{ font-size: 16px; }}
+      .strategy-thesis {{ grid-template-columns: 1fr; padding: 0 12px; }}
       .cards {{ grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 12px; }}
       .date-controls {{ padding: 12px; }}
       .date-status {{ margin-left: 0; flex-basis: 100%; }}
@@ -1876,9 +1974,18 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
       .parameter-grid {{ grid-template-columns: 1fr; }}
       .section-heading {{ align-items: start; flex-direction: column; gap: 8px; }}
       .period {{ text-align: left; }}
-      header {{ padding: 16px 18px; }}
     }}
     @media (max-width: 620px) {{
+      h1 {{ font-size: 31px; }}
+      .report-hero {{ padding: 28px 18px 22px; }}
+      .hero-copy p {{ margin-top: 14px; font-size: 15px; line-height: 1.65; }}
+      .hero-meta {{ gap: 8px; margin-top: 18px; }}
+      .hero-meta span {{ padding: 6px 9px; }}
+      .hero-stats {{ grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }}
+      .hero-stat {{ min-height: 94px; padding: 13px; }}
+      .hero-stat span {{ font-size: 10px; }}
+      .hero-stat b {{ margin-top: 12px; font-size: 20px; }}
+      .factor-grid {{ grid-template-columns: 1fr; }}
       .cards {{ grid-template-columns: 1fr; }}
       .signal-card {{ padding: 20px 18px 20px 24px; }}
       .signal-card h3, .signal-card.expectation h3 {{ font-size: 21px; }}
@@ -1889,16 +1996,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
   </style>
 </head>
 <body>
-  <header>
-    <h1>Strategy 12: Apex Predator Dashboard</h1>
-    <div class="strategy-intro">
-      <p>Apex Predator 是一套改良版的 SOX 定期定額加碼策略（DCA），共有三大因子：</p>
-      <p><b>1) RMDD</b>－追蹤 SOX 指數 1 年交易日的高點的回撤，跌破設定的防線（Level）時啟動標準加碼（STD Level Buy）</p>
-      <p><b>2) S&amp;P500 恐慌指數 (VIX)</b>－判斷市場系統性恐慌程度，當 VIX 大於一定程度（市場很恐慌），且 RMDD 跌破深層防線時（且市場跌很深），將額外啟動狙擊加碼（Sniper Shot）</p>
-      <p><b>3) 季節效應</b>－根據歷史資料回測，發現 10 月股市的回落程度顯著，因此在該月月底的基礎加碼（Fallback buy）將上調至 1.5 份。</p>
-    </div>
-    <div class="subtitle">{subtitle}</div>
-  </header>
+  {report_summary}
   <section class="date-controls">
     <div class="date-panel">
       <label>起始日期<input id="startDate" type="date"></label>
@@ -1923,6 +2021,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
       <div id="rmddSampleDistribution" class="parameter-chart wide"></div>
     </div>
   </section>
+  {strategy_details}
   {interactive_script}
 </body>
 </html>"""
