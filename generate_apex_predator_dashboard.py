@@ -1022,6 +1022,12 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
       const annualizedAbsoluteDca = (Math.pow(m.finalValDca / m.costDca, 1 / years) - 1) * 100;
       const totalXirrStrat = (Math.pow(1 + m.xirrStrat / 100, years) - 1) * 100;
       const totalXirrDca = (Math.pow(1 + m.xirrDca / 100, years) - 1) * 100;
+      const finalValueDiff = m.finalValStrat - m.finalValDca;
+      const costDiff = m.costStrat - m.costDca;
+      const maxMonthlyDiff = m.maxMonthlyCost - strategyConfig.baseAmount;
+      const annualizedAbsoluteDiff = annualizedAbsoluteStrat - annualizedAbsoluteDca;
+      const absoluteReturnDiff = absoluteReturnStrat - absoluteReturnDca;
+      const totalXirrDiff = totalXirrStrat - totalXirrDca;
       const fallbackCount = result.buys.filter(buy => buy.Type === 'Fallback Buy').length;
       const standardCount = result.buys.filter(buy => buy.Type === 'STD Level Buy').length;
       const sniperCount = result.buys.filter(buy => buy.Type === 'Sniper Shot').length;
@@ -1042,35 +1048,35 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
           <div class="period">${m.startDate} 至 ${m.finalDate}<span>約 ${years.toFixed(1)} 年</span></div>
         </div>
         <div class="performance-grid">
-          <div class="comparison">
-            <div class="comparison-head">
-              <span>績效指標</span>
-              <strong>Apex Predator</strong>
-              <strong>純 DCA</strong>
-              <strong>%／差值</strong>
+          <div class="summary-panel">
+            <div class="outcome-grid">
+              <article class="outcome-card primary">
+                <span>最終資產差額</span>
+                <b>${signedIntFmt.format(finalValueDiff)}</b>
+                <small>Apex Predator ${money(m.finalValStrat)} / 純 DCA ${money(m.finalValDca)}</small>
+              </article>
+              <article class="outcome-card">
+                <span>年化 XIRR 差距</span>
+                <b class="${diffClass(m.xirrDiff)}">${signedPct(m.xirrDiff)}</b>
+                <small>${pct(m.xirrStrat)} vs ${pct(m.xirrDca)}</small>
+              </article>
+              <article class="outcome-card">
+                <span>總投入差額</span>
+                <b>${signedIntFmt.format(costDiff)}</b>
+                <small>${money(m.costStrat)} vs ${money(m.costDca)}</small>
+              </article>
+              <article class="outcome-card">
+                <span>買入頻率</span>
+                <b>${(result.buys.length / years).toFixed(1)} 次／年</b>
+                <small>累計 ${intFmt.format(result.buys.length)} 次買入</small>
+              </article>
             </div>
-            <div class="comparison-row">
-              <span>總投入成本</span><b>${money(m.costStrat)}</b><b>${money(m.costDca)}</b><b class="diff-neutral">${signedIntFmt.format(m.costStrat - m.costDca)}</b>
+            <div class="compact-comparison">
+              <div class="compact-row compact-head"><span>核心指標</span><strong>Apex Predator</strong><strong>純 DCA</strong><strong>差值</strong></div>
+              <div class="compact-row"><span>最終資產</span><b>${money(m.finalValStrat)}</b><b>${money(m.finalValDca)}</b><b class="diff-neutral">${signedIntFmt.format(finalValueDiff)}</b></div>
+              <div class="compact-row"><span>總投入</span><b>${money(m.costStrat)}</b><b>${money(m.costDca)}</b><b class="diff-neutral">${signedIntFmt.format(costDiff)}</b></div>
+              <div class="compact-row emphasis"><span>年化 XIRR</span><b>${pct(m.xirrStrat)}</b><b>${pct(m.xirrDca)}</b><b class="${diffClass(m.xirrDiff)}">${signedPct(m.xirrDiff)}</b></div>
             </div>
-            <div class="comparison-row">
-              <span>最終資產價值</span><b>${money(m.finalValStrat)}</b><b>${money(m.finalValDca)}</b><b class="diff-neutral">${signedIntFmt.format(m.finalValStrat - m.finalValDca)}</b>
-            </div>
-            <div class="comparison-row">
-              <span>單月最高投入</span><b>${money(m.maxMonthlyCost)}</b><b>${money(strategyConfig.baseAmount)}</b><b class="diff-neutral">${signedIntFmt.format(m.maxMonthlyCost - strategyConfig.baseAmount)}</b>
-            </div>
-            <div class="comparison-row return-divider">
-              <span>絕對績效</span><b>${pct(absoluteReturnStrat)}</b><b>${pct(absoluteReturnDca)}</b><b class="${diffClass(absoluteReturnStrat - absoluteReturnDca)}">${signedPct(absoluteReturnStrat - absoluteReturnDca)}</b>
-            </div>
-            <div class="comparison-row">
-              <span>平均年化絕對報酬</span><b>${pct(annualizedAbsoluteStrat)}</b><b>${pct(annualizedAbsoluteDca)}</b><b class="${diffClass(annualizedAbsoluteStrat - annualizedAbsoluteDca)}">${signedPct(annualizedAbsoluteStrat - annualizedAbsoluteDca)}</b>
-            </div>
-            <div class="comparison-row">
-              <span>總體 XIRR</span><b>${pct(totalXirrStrat)}</b><b>${pct(totalXirrDca)}</b><b class="${diffClass(totalXirrStrat - totalXirrDca)}">${signedPct(totalXirrStrat - totalXirrDca)}</b>
-            </div>
-            <div class="comparison-row emphasis">
-              <span>年化報酬率 XIRR</span><b>${pct(m.xirrStrat)}</b><b>${pct(m.xirrDca)}</b><b class="${diffClass(m.xirrDiff)}">${signedPct(m.xirrDiff)}</b>
-            </div>
-            <div class="comparison-footnote">差值為 Apex Predator − 純 DCA。<br>XIRR（擴展內部報酬率）是專門用來計算「不定期、多筆現金流」的年化報酬率指標。<br>總體 XIRR 為年化 XIRR 按完整回測期間複利換算。</div>
           </div>
           <aside class="trade-summary">
             <div class="trade-title">交易訊號統計</div>
@@ -1093,6 +1099,46 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
               </div>
             </div>
           </aside>
+        </div>
+      `;
+
+      document.querySelector('.detailed-performance').innerHTML = `
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">完整績效指標</span>
+            <h2>Apex Predator 與純定期定額完整比較</h2>
+          </div>
+          <div class="period">${m.startDate} 至 ${m.finalDate}<span>約 ${years.toFixed(1)} 年</span></div>
+        </div>
+        <div class="comparison">
+          <div class="comparison-head">
+            <span>績效指標</span>
+            <strong>Apex Predator</strong>
+            <strong>純 DCA</strong>
+            <strong>%／差值</strong>
+          </div>
+          <div class="comparison-row">
+            <span>總投入成本</span><b>${money(m.costStrat)}</b><b>${money(m.costDca)}</b><b class="diff-neutral">${signedIntFmt.format(costDiff)}</b>
+          </div>
+          <div class="comparison-row">
+            <span>最終資產價值</span><b>${money(m.finalValStrat)}</b><b>${money(m.finalValDca)}</b><b class="diff-neutral">${signedIntFmt.format(finalValueDiff)}</b>
+          </div>
+          <div class="comparison-row">
+            <span>單月最高投入</span><b>${money(m.maxMonthlyCost)}</b><b>${money(strategyConfig.baseAmount)}</b><b class="diff-neutral">${signedIntFmt.format(maxMonthlyDiff)}</b>
+          </div>
+          <div class="comparison-row return-divider">
+            <span>絕對績效</span><b>${pct(absoluteReturnStrat)}</b><b>${pct(absoluteReturnDca)}</b><b class="${diffClass(absoluteReturnDiff)}">${signedPct(absoluteReturnDiff)}</b>
+          </div>
+          <div class="comparison-row">
+            <span>平均年化絕對報酬</span><b>${pct(annualizedAbsoluteStrat)}</b><b>${pct(annualizedAbsoluteDca)}</b><b class="${diffClass(annualizedAbsoluteDiff)}">${signedPct(annualizedAbsoluteDiff)}</b>
+          </div>
+          <div class="comparison-row">
+            <span>總體 XIRR</span><b>${pct(totalXirrStrat)}</b><b>${pct(totalXirrDca)}</b><b class="${diffClass(totalXirrDiff)}">${signedPct(totalXirrDiff)}</b>
+          </div>
+          <div class="comparison-row emphasis">
+            <span>年化報酬率 XIRR</span><b>${pct(m.xirrStrat)}</b><b>${pct(m.xirrDca)}</b><b class="${diffClass(m.xirrDiff)}">${signedPct(m.xirrDiff)}</b>
+          </div>
+          <div class="comparison-footnote">差值為 Apex Predator − 純 DCA。<br>XIRR（擴展內部報酬率）是專門用來計算「不定期、多筆現金流」的年化報酬率指標。<br>總體 XIRR 為年化 XIRR 按完整回測期間複利換算。</div>
         </div>
       `;
     }
@@ -1729,6 +1775,68 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     </div>
   </section>
 """
+    detailed_performance_summary = f"""
+  <section class="detailed-performance">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">完整績效指標</span>
+        <h2>Apex Predator 與純定期定額完整比較</h2>
+      </div>
+      <div class="period">{start_date.date()} 至 {metrics['final_date'].date()}<span>約 {years:.1f} 年</span></div>
+    </div>
+    <div class="comparison">
+      <div class="comparison-head">
+        <span>績效指標</span>
+        <strong>Apex Predator</strong>
+        <strong>純 DCA</strong>
+        <strong>%／差值</strong>
+      </div>
+      <div class="comparison-row">
+        <span>總投入成本</span>
+        <b>{money(metrics['cost_strat'])}</b>
+        <b>{money(metrics['cost_dca'])}</b>
+        <b class="diff-neutral">{cost_diff:+,.0f}</b>
+      </div>
+      <div class="comparison-row">
+        <span>最終資產價值</span>
+        <b>{money(metrics['final_val_strat'])}</b>
+        <b>{money(metrics['final_val_dca'])}</b>
+        <b class="diff-neutral">{final_value_diff:+,.0f}</b>
+      </div>
+      <div class="comparison-row">
+        <span>單月最高投入</span>
+        <b>{money(metrics['max_monthly_cost'])}</b>
+        <b>{money(CONFIG['BASE_AMOUNT'])}</b>
+        <b class="diff-neutral">{max_monthly_diff:+,.0f}</b>
+      </div>
+      <div class="comparison-row return-divider">
+        <span>絕對績效</span>
+        <b>{absolute_return_strat:.2f}%</b>
+        <b>{absolute_return_dca:.2f}%</b>
+        <b class="{difference_class(absolute_return_diff)}">{absolute_return_diff:+.2f}%</b>
+      </div>
+      <div class="comparison-row">
+        <span>平均年化絕對報酬</span>
+        <b>{annualized_absolute_strat:.2f}%</b>
+        <b>{annualized_absolute_dca:.2f}%</b>
+        <b class="{difference_class(annualized_absolute_diff)}">{annualized_absolute_diff:+.2f}%</b>
+      </div>
+      <div class="comparison-row">
+        <span>總體 XIRR</span>
+        <b>{total_xirr_strat:.2f}%</b>
+        <b>{total_xirr_dca:.2f}%</b>
+        <b class="{difference_class(total_xirr_diff)}">{total_xirr_diff:+.2f}%</b>
+      </div>
+      <div class="comparison-row emphasis">
+        <span>年化報酬率 XIRR</span>
+        <b>{pct(metrics['xirr_strat'])}</b>
+        <b>{pct(metrics['xirr_dca'])}</b>
+        <b class="{difference_class(metrics['xirr_diff'])}">{metrics['xirr_diff']:+.2f}%</b>
+      </div>
+      <div class="comparison-footnote">差值為 Apex Predator − 純 DCA。<br>XIRR（擴展內部報酬率）是專門用來計算「不定期、多筆現金流」的年化報酬率指標。<br>總體 XIRR 為年化 XIRR 按完整回測期間複利換算。</div>
+    </div>
+  </section>
+"""
     performance_summary = f"""
   <section class="performance">
     <div class="section-heading">
@@ -1739,56 +1847,35 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
       <div class="period">{start_date.date()} 至 {metrics['final_date'].date()}<span>約 {years:.1f} 年</span></div>
     </div>
     <div class="performance-grid">
-      <div class="comparison">
-        <div class="comparison-head">
-          <span>績效指標</span>
-          <strong>Apex Predator</strong>
-          <strong>純 DCA</strong>
-          <strong>%／差值</strong>
+      <div class="summary-panel">
+        <div class="outcome-grid">
+          <article class="outcome-card primary">
+            <span>最終資產差額</span>
+            <b>{final_value_diff:+,.0f}</b>
+            <small>Apex Predator {money(metrics['final_val_strat'])} / 純 DCA {money(metrics['final_val_dca'])}</small>
+          </article>
+          <article class="outcome-card">
+            <span>年化 XIRR 差距</span>
+            <b class="{difference_class(metrics['xirr_diff'])}">{metrics['xirr_diff']:+.2f}%</b>
+            <small>{pct(metrics['xirr_strat'])} vs {pct(metrics['xirr_dca'])}</small>
+          </article>
+          <article class="outcome-card">
+            <span>總投入差額</span>
+            <b>{cost_diff:+,.0f}</b>
+            <small>{money(metrics['cost_strat'])} vs {money(metrics['cost_dca'])}</small>
+          </article>
+          <article class="outcome-card">
+            <span>買入頻率</span>
+            <b>{len(buys) / years:.1f} 次／年</b>
+            <small>累計 {len(buys):,} 次買入</small>
+          </article>
         </div>
-        <div class="comparison-row">
-          <span>總投入成本</span>
-          <b>{money(metrics['cost_strat'])}</b>
-          <b>{money(metrics['cost_dca'])}</b>
-          <b class="diff-neutral">{cost_diff:+,.0f}</b>
+        <div class="compact-comparison">
+          <div class="compact-row compact-head"><span>核心指標</span><strong>Apex Predator</strong><strong>純 DCA</strong><strong>差值</strong></div>
+          <div class="compact-row"><span>最終資產</span><b>{money(metrics['final_val_strat'])}</b><b>{money(metrics['final_val_dca'])}</b><b class="diff-neutral">{final_value_diff:+,.0f}</b></div>
+          <div class="compact-row"><span>總投入</span><b>{money(metrics['cost_strat'])}</b><b>{money(metrics['cost_dca'])}</b><b class="diff-neutral">{cost_diff:+,.0f}</b></div>
+          <div class="compact-row emphasis"><span>年化 XIRR</span><b>{pct(metrics['xirr_strat'])}</b><b>{pct(metrics['xirr_dca'])}</b><b class="{difference_class(metrics['xirr_diff'])}">{metrics['xirr_diff']:+.2f}%</b></div>
         </div>
-        <div class="comparison-row">
-          <span>最終資產價值</span>
-          <b>{money(metrics['final_val_strat'])}</b>
-          <b>{money(metrics['final_val_dca'])}</b>
-          <b class="diff-neutral">{final_value_diff:+,.0f}</b>
-        </div>
-        <div class="comparison-row">
-          <span>單月最高投入</span>
-          <b>{money(metrics['max_monthly_cost'])}</b>
-          <b>{money(CONFIG['BASE_AMOUNT'])}</b>
-          <b class="diff-neutral">{max_monthly_diff:+,.0f}</b>
-        </div>
-        <div class="comparison-row return-divider">
-          <span>絕對績效</span>
-          <b>{absolute_return_strat:.2f}%</b>
-          <b>{absolute_return_dca:.2f}%</b>
-          <b class="{difference_class(absolute_return_diff)}">{absolute_return_diff:+.2f}%</b>
-        </div>
-        <div class="comparison-row">
-          <span>平均年化絕對報酬</span>
-          <b>{annualized_absolute_strat:.2f}%</b>
-          <b>{annualized_absolute_dca:.2f}%</b>
-          <b class="{difference_class(annualized_absolute_diff)}">{annualized_absolute_diff:+.2f}%</b>
-        </div>
-        <div class="comparison-row">
-          <span>總體 XIRR</span>
-          <b>{total_xirr_strat:.2f}%</b>
-          <b>{total_xirr_dca:.2f}%</b>
-          <b class="{difference_class(total_xirr_diff)}">{total_xirr_diff:+.2f}%</b>
-        </div>
-        <div class="comparison-row emphasis">
-          <span>年化報酬率 XIRR</span>
-          <b>{pct(metrics['xirr_strat'])}</b>
-          <b>{pct(metrics['xirr_dca'])}</b>
-          <b class="{difference_class(metrics['xirr_diff'])}">{metrics['xirr_diff']:+.2f}%</b>
-        </div>
-        <div class="comparison-footnote">差值為 Apex Predator − 純 DCA。<br>XIRR（擴展內部報酬率）是專門用來計算「不定期、多筆現金流」的年化報酬率指標。<br>總體 XIRR 為年化 XIRR 按完整回測期間複利換算。</div>
       </div>
       <aside class="trade-summary">
         <div class="trade-title">交易訊號統計</div>
@@ -1908,6 +1995,21 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     .period {{ color: var(--soft); font-size: 14px; text-align: right; }}
     .period span {{ display: block; margin-top: 3px; color: var(--muted); font-size: 12px; }}
     .performance-grid {{ display: grid; grid-template-columns: minmax(0, 2.25fr) minmax(240px, 0.75fr); gap: 12px; }}
+    .summary-panel {{ display: grid; gap: 12px; }}
+    .outcome-grid {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }}
+    .outcome-card {{ min-height: 134px; padding: 18px; background: rgba(13, 26, 39, 0.94); border: 1px solid var(--line); border-radius: 8px; }}
+    .outcome-card.primary {{ border-color: rgba(98, 230, 255, 0.46); background: linear-gradient(180deg, rgba(98, 230, 255, 0.13), rgba(13, 26, 39, 0.94)); }}
+    .outcome-card span {{ display: block; color: var(--muted); font-size: 12px; font-weight: 700; }}
+    .outcome-card b {{ display: block; margin-top: 14px; color: var(--text); font-size: 25px; line-height: 1.1; font-variant-numeric: tabular-nums; }}
+    .outcome-card.primary b {{ color: var(--cyan); }}
+    .outcome-card small {{ display: block; margin-top: 12px; color: var(--muted); font-size: 12px; line-height: 1.45; }}
+    .compact-comparison {{ background: rgba(13, 26, 39, 0.94); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }}
+    .compact-row {{ display: grid; grid-template-columns: minmax(120px, 1fr) minmax(126px, 1fr) minmax(126px, 1fr) minmax(92px, 0.72fr); align-items: center; gap: 14px; padding: 13px 16px; border-top: 1px solid rgba(149, 179, 210, 0.14); color: var(--soft); font-size: 14px; }}
+    .compact-row:first-child {{ border-top: 0; }}
+    .compact-head {{ background: rgba(98, 230, 255, 0.09); color: var(--muted); font-size: 13px; }}
+    .compact-row b, .compact-row strong {{ color: var(--text); font-variant-numeric: tabular-nums; }}
+    .compact-row.emphasis {{ background: rgba(98, 230, 255, 0.08); }}
+    .compact-row.emphasis b {{ color: var(--cyan); font-size: 17px; }}
     .comparison, .trade-summary {{ background: rgba(13, 26, 39, 0.94); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }}
     .comparison-head, .comparison-row {{ display: grid; grid-template-columns: minmax(140px, 1.15fr) minmax(130px, 1fr) minmax(130px, 1fr) minmax(100px, 0.75fr); align-items: center; column-gap: 16px; padding: 11px 16px; }}
     .comparison-head {{ background: rgba(98, 230, 255, 0.09); color: var(--soft); font-size: 13px; }}
@@ -1981,6 +2083,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     .strategy-details h2 {{ margin: 4px 0 14px; color: var(--text); font-size: 24px; }}
     .strategy-details p {{ margin: 0 0 9px; color: var(--soft); font-size: 15px; line-height: 1.8; }}
     .strategy-details b {{ color: var(--cyan); }}
+    .detailed-performance {{ max-width: 1180px; margin: 0 auto 54px; padding: 30px 28px 0; }}
     @media (max-width: 900px) {{
       .report-hero {{ padding: 34px 18px 24px; }}
       .hero-inner {{ grid-template-columns: 1fr; gap: 18px; }}
@@ -1992,8 +2095,10 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
       .date-status {{ margin-left: 0; flex-basis: 100%; }}
       .performance {{ padding: 0 12px; }}
       .performance-grid {{ grid-template-columns: 1fr; }}
+      .outcome-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
       .signal-grid {{ grid-template-columns: 1fr; }}
       .parameter-analysis {{ padding: 0 12px; }}
+      .detailed-performance {{ padding: 24px 12px 0; }}
       .parameter-grid {{ grid-template-columns: 1fr; }}
       .section-heading {{ align-items: start; flex-direction: column; gap: 8px; }}
       .period {{ text-align: left; }}
@@ -2009,6 +2114,9 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
       .hero-stat span {{ font-size: 10px; }}
       .hero-stat b {{ margin-top: 12px; font-size: 20px; }}
       .factor-grid {{ grid-template-columns: 1fr; }}
+      .outcome-grid {{ grid-template-columns: 1fr; }}
+      .compact-comparison {{ overflow-x: auto; }}
+      .compact-row {{ min-width: 620px; }}
       .cards {{ grid-template-columns: 1fr; }}
       .signal-card {{ padding: 20px 18px 20px 24px; }}
       .signal-card h3, .signal-card.expectation h3 {{ font-size: 21px; }}
@@ -2045,6 +2153,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     </div>
   </section>
   {strategy_details}
+  {detailed_performance_summary}
   {interactive_script}
 </body>
 </html>"""
