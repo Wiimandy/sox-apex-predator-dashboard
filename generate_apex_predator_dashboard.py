@@ -2119,6 +2119,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     .outcome-card span {{ display: block; color: var(--muted); font-size: 12px; font-weight: 700; }}
     .outcome-card b {{ display: block; margin-top: 14px; color: var(--text); font-size: 25px; line-height: 1.1; font-variant-numeric: tabular-nums; }}
     .outcome-card.primary b {{ color: var(--cyan); }}
+    .outcome-card[data-metric]:hover b, .outcome-card[data-metric]:focus-visible b, .outcome-card.is-linked-active b {{ color: var(--cyan); }}
     .outcome-card small {{ display: block; margin-top: 12px; color: var(--muted); font-size: 12px; line-height: 1.45; }}
     .compact-comparison {{ background: rgba(13, 26, 39, 0.94); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }}
     .compact-row {{ display: grid; grid-template-columns: minmax(120px, 1fr) minmax(126px, 1fr) minmax(126px, 1fr) minmax(92px, 0.72fr); align-items: center; gap: 14px; padding: 13px 16px; border-top: 1px solid rgba(149, 179, 210, 0.14); color: var(--soft); font-size: 14px; transition: background 180ms ease, box-shadow 180ms ease, opacity 180ms ease, color 180ms ease; }}
@@ -2130,6 +2131,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     .compact-row b, .compact-row strong {{ color: var(--text); font-variant-numeric: tabular-nums; }}
     .compact-row.emphasis {{ background: rgba(98, 230, 255, 0.08); }}
     .compact-row.emphasis b {{ color: var(--cyan); font-size: 17px; }}
+    .compact-row[data-metric]:hover b, .compact-row[data-metric]:focus-visible b, .compact-row.is-linked-active b {{ color: var(--cyan); }}
     .comparison, .trade-summary {{ background: rgba(13, 26, 39, 0.94); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }}
     .comparison-head, .comparison-row {{ display: grid; grid-template-columns: minmax(140px, 1.15fr) minmax(130px, 1fr) minmax(130px, 1fr) minmax(100px, 0.75fr); align-items: center; column-gap: 16px; padding: 11px 16px; }}
     .comparison-head {{ background: rgba(98, 230, 255, 0.09); color: var(--soft); font-size: 13px; }}
