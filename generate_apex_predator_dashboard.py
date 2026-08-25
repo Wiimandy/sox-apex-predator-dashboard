@@ -2112,13 +2112,11 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     .summary-panel {{ display: grid; gap: 12px; }}
     .outcome-grid {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }}
     .outcome-card {{ min-height: 134px; padding: 18px; background: rgba(13, 26, 39, 0.94); border: 1px solid var(--line); border-radius: 8px; transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease, opacity 180ms ease; }}
-    .outcome-card.primary {{ border-color: rgba(98, 230, 255, 0.46); background: linear-gradient(180deg, rgba(98, 230, 255, 0.13), rgba(13, 26, 39, 0.94)); }}
     .outcome-card[data-metric] {{ cursor: default; outline: none; }}
     .outcome-card[data-metric]:hover, .outcome-card[data-metric]:focus-visible, .outcome-card.is-linked-active {{ transform: translateY(-4px); border-color: rgba(98, 230, 255, 0.72); background: linear-gradient(180deg, rgba(98, 230, 255, 0.18), rgba(13, 26, 39, 0.97)); box-shadow: 0 18px 42px rgba(0, 0, 0, 0.34), 0 0 0 1px rgba(98, 230, 255, 0.18) inset; }}
     .outcome-grid:has(.is-linked-active) .outcome-card:not(.is-linked-active) {{ opacity: 0.58; }}
     .outcome-card span {{ display: block; color: var(--muted); font-size: 12px; font-weight: 700; }}
     .outcome-card b {{ display: block; margin-top: 14px; color: var(--text); font-size: 25px; line-height: 1.1; font-variant-numeric: tabular-nums; }}
-    .outcome-card.primary b {{ color: var(--cyan); }}
     .outcome-card[data-metric]:hover b, .outcome-card[data-metric]:focus-visible b, .outcome-card.is-linked-active b {{ color: var(--cyan); }}
     .outcome-card small {{ display: block; margin-top: 12px; color: var(--muted); font-size: 12px; line-height: 1.45; }}
     .compact-comparison {{ background: rgba(13, 26, 39, 0.94); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }}
