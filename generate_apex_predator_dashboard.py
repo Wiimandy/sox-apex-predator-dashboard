@@ -930,6 +930,28 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
       `;
     }
 
+    function bindPerformanceMetricHover() {
+      const performance = document.querySelector('.performance');
+      if (!performance) return;
+      const metricItems = [...performance.querySelectorAll('[data-metric]')];
+      const clearActive = () => {
+        metricItems.forEach(item => item.classList.remove('is-linked-active'));
+      };
+      const setActive = metric => {
+        clearActive();
+        performance.querySelectorAll(`[data-metric="${metric}"]`).forEach(item => {
+          item.classList.add('is-linked-active');
+        });
+      };
+      metricItems.forEach(item => {
+        const metric = item.dataset.metric;
+        item.addEventListener('mouseenter', () => setActive(metric));
+        item.addEventListener('mouseleave', clearActive);
+        item.addEventListener('focus', () => setActive(metric));
+        item.addEventListener('blur', clearActive);
+      });
+    }
+
     function readableBuyNote(note) {
       return String(note || '')
         .split(' + ')
@@ -1058,22 +1080,22 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
         <div class="performance-grid">
           <div class="summary-panel">
             <div class="outcome-grid">
-              <article class="outcome-card primary">
+              <article class="outcome-card primary" data-metric="final-value" tabindex="0">
                 <span>最終資產差額</span>
                 <b>${signedIntFmt.format(finalValueDiff)}</b>
                 <small>Apex Predator ${money(m.finalValStrat)} / 純 DCA ${money(m.finalValDca)}</small>
               </article>
-              <article class="outcome-card">
+              <article class="outcome-card" data-metric="xirr" tabindex="0">
                 <span>年化 XIRR 差距</span>
                 <b class="${diffClass(m.xirrDiff)}">${signedPct(m.xirrDiff)}</b>
                 <small>${pct(m.xirrStrat)} vs ${pct(m.xirrDca)}</small>
               </article>
-              <article class="outcome-card">
+              <article class="outcome-card" data-metric="cost" tabindex="0">
                 <span>總投入差額</span>
                 <b>${signedIntFmt.format(costDiff)}</b>
                 <small>${money(m.costStrat)} vs ${money(m.costDca)}</small>
               </article>
-              <article class="outcome-card">
+              <article class="outcome-card" data-metric="buy-frequency" tabindex="0">
                 <span>買入頻率</span>
                 <b>${(result.buys.length / years).toFixed(1)} 次／年</b>
                 <small>累計 ${intFmt.format(result.buys.length)} 次買入</small>
@@ -1081,9 +1103,9 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
             </div>
             <div class="compact-comparison">
               <div class="compact-row compact-head"><span>核心指標</span><strong>Apex Predator</strong><strong>純 DCA</strong><strong>差值</strong></div>
-              <div class="compact-row"><span>最終資產</span><b>${money(m.finalValStrat)}</b><b>${money(m.finalValDca)}</b><b class="diff-neutral">${signedIntFmt.format(finalValueDiff)}</b></div>
-              <div class="compact-row"><span>總投入</span><b>${money(m.costStrat)}</b><b>${money(m.costDca)}</b><b class="diff-neutral">${signedIntFmt.format(costDiff)}</b></div>
-              <div class="compact-row emphasis"><span>年化 XIRR</span><b>${pct(m.xirrStrat)}</b><b>${pct(m.xirrDca)}</b><b class="${diffClass(m.xirrDiff)}">${signedPct(m.xirrDiff)}</b></div>
+              <div class="compact-row" data-metric="final-value" tabindex="0"><span>最終資產</span><b>${money(m.finalValStrat)}</b><b>${money(m.finalValDca)}</b><b class="diff-neutral">${signedIntFmt.format(finalValueDiff)}</b></div>
+              <div class="compact-row" data-metric="cost" tabindex="0"><span>總投入</span><b>${money(m.costStrat)}</b><b>${money(m.costDca)}</b><b class="diff-neutral">${signedIntFmt.format(costDiff)}</b></div>
+              <div class="compact-row emphasis" data-metric="xirr" tabindex="0"><span>年化 XIRR</span><b>${pct(m.xirrStrat)}</b><b>${pct(m.xirrDca)}</b><b class="${diffClass(m.xirrDiff)}">${signedPct(m.xirrDiff)}</b></div>
             </div>
           </div>
           ${isDetailPage ? `
@@ -1111,6 +1133,7 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
           ` : ''}
         </div>
       `;
+      bindPerformanceMetricHover();
 
       const detailedPerformance = document.querySelector('.detailed-performance');
       if (detailedPerformance) detailedPerformance.innerHTML = `
@@ -1906,22 +1929,22 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     <div class="performance-grid">
       <div class="summary-panel">
         <div class="outcome-grid">
-          <article class="outcome-card primary">
+          <article class="outcome-card primary" data-metric="final-value" tabindex="0">
             <span>最終資產差額</span>
             <b>{final_value_diff:+,.0f}</b>
             <small>Apex Predator {money(metrics['final_val_strat'])} / 純 DCA {money(metrics['final_val_dca'])}</small>
           </article>
-          <article class="outcome-card">
+          <article class="outcome-card" data-metric="xirr" tabindex="0">
             <span>年化 XIRR 差距</span>
             <b class="{difference_class(metrics['xirr_diff'])}">{metrics['xirr_diff']:+.2f}%</b>
             <small>{pct(metrics['xirr_strat'])} vs {pct(metrics['xirr_dca'])}</small>
           </article>
-          <article class="outcome-card">
+          <article class="outcome-card" data-metric="cost" tabindex="0">
             <span>總投入差額</span>
             <b>{cost_diff:+,.0f}</b>
             <small>{money(metrics['cost_strat'])} vs {money(metrics['cost_dca'])}</small>
           </article>
-          <article class="outcome-card">
+          <article class="outcome-card" data-metric="buy-frequency" tabindex="0">
             <span>買入頻率</span>
             <b>{len(buys) / years:.1f} 次／年</b>
             <small>累計 {len(buys):,} 次買入</small>
@@ -1929,9 +1952,9 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
         </div>
         <div class="compact-comparison">
           <div class="compact-row compact-head"><span>核心指標</span><strong>Apex Predator</strong><strong>純 DCA</strong><strong>差值</strong></div>
-          <div class="compact-row"><span>最終資產</span><b>{money(metrics['final_val_strat'])}</b><b>{money(metrics['final_val_dca'])}</b><b class="diff-neutral">{final_value_diff:+,.0f}</b></div>
-          <div class="compact-row"><span>總投入</span><b>{money(metrics['cost_strat'])}</b><b>{money(metrics['cost_dca'])}</b><b class="diff-neutral">{cost_diff:+,.0f}</b></div>
-          <div class="compact-row emphasis"><span>年化 XIRR</span><b>{pct(metrics['xirr_strat'])}</b><b>{pct(metrics['xirr_dca'])}</b><b class="{difference_class(metrics['xirr_diff'])}">{metrics['xirr_diff']:+.2f}%</b></div>
+          <div class="compact-row" data-metric="final-value" tabindex="0"><span>最終資產</span><b>{money(metrics['final_val_strat'])}</b><b>{money(metrics['final_val_dca'])}</b><b class="diff-neutral">{final_value_diff:+,.0f}</b></div>
+          <div class="compact-row" data-metric="cost" tabindex="0"><span>總投入</span><b>{money(metrics['cost_strat'])}</b><b>{money(metrics['cost_dca'])}</b><b class="diff-neutral">{cost_diff:+,.0f}</b></div>
+          <div class="compact-row emphasis" data-metric="xirr" tabindex="0"><span>年化 XIRR</span><b>{pct(metrics['xirr_strat'])}</b><b>{pct(metrics['xirr_dca'])}</b><b class="{difference_class(metrics['xirr_diff'])}">{metrics['xirr_diff']:+.2f}%</b></div>
         </div>
       </div>
       {trade_summary_html}
@@ -2088,16 +2111,22 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     .pitch-performance .performance-grid {{ grid-template-columns: 1fr; }}
     .summary-panel {{ display: grid; gap: 12px; }}
     .outcome-grid {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }}
-    .outcome-card {{ min-height: 134px; padding: 18px; background: rgba(13, 26, 39, 0.94); border: 1px solid var(--line); border-radius: 8px; }}
+    .outcome-card {{ min-height: 134px; padding: 18px; background: rgba(13, 26, 39, 0.94); border: 1px solid var(--line); border-radius: 8px; transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease, opacity 180ms ease; }}
     .outcome-card.primary {{ border-color: rgba(98, 230, 255, 0.46); background: linear-gradient(180deg, rgba(98, 230, 255, 0.13), rgba(13, 26, 39, 0.94)); }}
+    .outcome-card[data-metric] {{ cursor: default; outline: none; }}
+    .outcome-card[data-metric]:hover, .outcome-card[data-metric]:focus-visible, .outcome-card.is-linked-active {{ transform: translateY(-4px); border-color: rgba(98, 230, 255, 0.72); background: linear-gradient(180deg, rgba(98, 230, 255, 0.18), rgba(13, 26, 39, 0.97)); box-shadow: 0 18px 42px rgba(0, 0, 0, 0.34), 0 0 0 1px rgba(98, 230, 255, 0.18) inset; }}
+    .outcome-grid:has(.is-linked-active) .outcome-card:not(.is-linked-active) {{ opacity: 0.58; }}
     .outcome-card span {{ display: block; color: var(--muted); font-size: 12px; font-weight: 700; }}
     .outcome-card b {{ display: block; margin-top: 14px; color: var(--text); font-size: 25px; line-height: 1.1; font-variant-numeric: tabular-nums; }}
     .outcome-card.primary b {{ color: var(--cyan); }}
     .outcome-card small {{ display: block; margin-top: 12px; color: var(--muted); font-size: 12px; line-height: 1.45; }}
     .compact-comparison {{ background: rgba(13, 26, 39, 0.94); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }}
-    .compact-row {{ display: grid; grid-template-columns: minmax(120px, 1fr) minmax(126px, 1fr) minmax(126px, 1fr) minmax(92px, 0.72fr); align-items: center; gap: 14px; padding: 13px 16px; border-top: 1px solid rgba(149, 179, 210, 0.14); color: var(--soft); font-size: 14px; }}
+    .compact-row {{ display: grid; grid-template-columns: minmax(120px, 1fr) minmax(126px, 1fr) minmax(126px, 1fr) minmax(92px, 0.72fr); align-items: center; gap: 14px; padding: 13px 16px; border-top: 1px solid rgba(149, 179, 210, 0.14); color: var(--soft); font-size: 14px; transition: background 180ms ease, box-shadow 180ms ease, opacity 180ms ease, color 180ms ease; }}
     .compact-row:first-child {{ border-top: 0; }}
     .compact-head {{ background: rgba(98, 230, 255, 0.09); color: var(--muted); font-size: 13px; }}
+    .compact-row[data-metric] {{ cursor: default; outline: none; }}
+    .compact-row[data-metric]:hover, .compact-row[data-metric]:focus-visible, .compact-row.is-linked-active {{ background: linear-gradient(90deg, rgba(98, 230, 255, 0.18), rgba(17, 34, 53, 0.94)); box-shadow: inset 4px 0 0 var(--cyan), inset 0 0 0 1px rgba(98, 230, 255, 0.18); }}
+    .compact-comparison:has(.is-linked-active) .compact-row[data-metric]:not(.is-linked-active) {{ opacity: 0.54; }}
     .compact-row b, .compact-row strong {{ color: var(--text); font-variant-numeric: tabular-nums; }}
     .compact-row.emphasis {{ background: rgba(98, 230, 255, 0.08); }}
     .compact-row.emphasis b {{ color: var(--cyan); font-size: 17px; }}
