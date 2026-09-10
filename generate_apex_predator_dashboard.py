@@ -1826,8 +1826,8 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
   </header>
   <section class="strategy-thesis">
     <div class="thesis-copy">
-      <span class="eyebrow">策略邏輯</span>
-      <h2>用回撤決定加碼節奏，用恐慌辨識狙擊時點。</h2>
+      <span class="eyebrow">策略三大因子</span>
+      <h2>市場回撤深度決定加碼程度；市場恐慌程度辨識狙擊時點。</h2>
       <p>這份 Dashboard 把策略績效、買入事件與市場狀態放在同一張互動圖表中，方便快速比較 Apex Predator 與純定期定額的長期結果。</p>
     </div>
     <div class="factor-grid">
