@@ -1341,7 +1341,7 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
         yaxis4: { domain: [0.02, 0.16], title: 'SOX Return (%)', gridcolor: 'rgba(149, 179, 210, 0.16)', zerolinecolor: 'rgba(149, 179, 210, 0.22)', ticksuffix: '%' },
         shapes,
         annotations: [
-          { text: 'Apex Predator Strategy<br>Portfolio Value ($) & Buy Events', xref: 'paper', yref: 'paper', x: 0.42, y: 1.04, showarrow: false, font: { size: 24, color: '#f4fbff' } },
+          { text: '費城半導體ETF 加碼策略<br>投資組合淨值（$）與購買事件', xref: 'paper', yref: 'paper', x: 0.42, y: 1.04, showarrow: false, font: { size: 24, color: '#f4fbff' } },
           { text: 'VIX Index', xref: 'paper', yref: 'paper', x: 0.42, y: 0.56, showarrow: false, font: { size: 22, color: '#f4fbff' } },
           { text: 'RMDD Zones', xref: 'paper', yref: 'paper', x: 0.42, y: 0.37, showarrow: false, font: { size: 22, color: '#f4fbff' } },
           { text: 'SOX Cumulative Return', xref: 'paper', yref: 'paper', x: 0.42, y: 0.18, showarrow: false, font: { size: 22, color: '#f4fbff' } },
@@ -1708,7 +1708,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
         "yaxis4": {"domain": [0.02, 0.16], "title": "SOX Return (%)", "gridcolor": "rgba(149, 179, 210, 0.16)", "zerolinecolor": "rgba(149, 179, 210, 0.22)", "ticksuffix": "%"},
         "shapes": shapes,
         "annotations": [
-            {"text": "Apex Predator Strategy<br>Portfolio Value ($) & Buy Events", "xref": "paper", "yref": "paper", "x": 0.42, "y": 1.04, "showarrow": False, "font": {"size": 24, "color": "#f4fbff"}},
+            {"text": "費城半導體ETF 加碼策略<br>投資組合淨值（$）與購買事件", "xref": "paper", "yref": "paper", "x": 0.42, "y": 1.04, "showarrow": False, "font": {"size": 24, "color": "#f4fbff"}},
             {"text": "VIX Index", "xref": "paper", "yref": "paper", "x": 0.42, "y": 0.56, "showarrow": False, "font": {"size": 22, "color": "#f4fbff"}},
             {"text": "RMDD Zones", "xref": "paper", "yref": "paper", "x": 0.42, "y": 0.37, "showarrow": False, "font": {"size": 22, "color": "#f4fbff"}},
             {"text": "SOX Cumulative Return", "xref": "paper", "yref": "paper", "x": 0.42, "y": 0.18, "showarrow": False, "font": {"size": 22, "color": "#f4fbff"}},
@@ -1788,9 +1788,8 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
   <header class="report-hero">
     <div class="hero-inner">
       <div class="hero-copy">
-        <span class="report-kicker">SOX 回測研究報告</span>
-        <h1>Apex Predator Strategy</h1>
-        <p>這是一套以 SOX 為標的、根據市場回撤與恐慌程度動態加碼的長期投資策略。</p>
+        <h1>費城半導體ETF 加碼策略</h1>
+        <p>這是一個以美國股市－費城半導體指數（簡稱SOX）為標的，並且根據市場回撤與市場恐慌程度（VIX）動態加碼的長期投資策略。</p>
         <div class="hero-meta">
           <span class="subtitle">{subtitle}</span>
           <span>{start_date.date()} 至 {metrics['final_date'].date()}</span>
@@ -1800,19 +1799,19 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
       </div>
       <div class="hero-stats" aria-label="核心績效數字">
         <div class="hero-stat">
-          <span>Final Portfolio</span>
+          <span>策略最終淨值</span>
           <b id="heroFinalValue">{money(metrics['final_val_strat'])}</b>
         </div>
         <div class="hero-stat">
-          <span>Total Invested</span>
+          <span>總投入金額</span>
           <b id="heroCost">{money(metrics['cost_strat'])}</b>
         </div>
         <div class="hero-stat">
-          <span>Annualized XIRR</span>
+          <span>年化報酬率（XIRR）</span>
           <b id="heroXirr">{pct(metrics['xirr_strat'])}</b>
         </div>
         <div class="hero-stat">
-          <span>Buy Events</span>
+          <span>購買次數</span>
           <b id="heroBuyCount">{len(buys):,}</b>
         </div>
       </div>
@@ -2017,7 +2016,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Apex Predator Strategy</title>
+  <title>費城半導體ETF 加碼策略</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="site.webmanifest">
