@@ -31,6 +31,16 @@
     * { box-sizing: border-box; }
     body { margin: 0; font-family: Arial, 'Microsoft JhengHei', 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); }
     body::before { content: ""; position: fixed; inset: 0; z-index: -1; background: linear-gradient(118deg, rgba(98, 230, 255, 0.14) 0%, transparent 28%, rgba(255, 209, 102, 0.08) 62%, transparent 100%), linear-gradient(180deg, #071019 0%, #091827 48%, #071019 100%); }
+    .copy-editor-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 10px 22px; background: rgba(5, 13, 22, 0.96); border-bottom: 1px solid var(--line); color: var(--soft); font-size: 12px; }
+    .copy-editor-toolbar b { color: var(--text); font-size: 13px; }
+    .copy-editor-toolbar span { color: var(--muted); }
+    .copy-editor-actions { display: flex; align-items: center; gap: 8px; }
+    .copy-editor-toolbar button { min-height: 32px; border: 1px solid var(--line); border-radius: 6px; padding: 0 11px; background: rgba(13, 26, 39, 0.92); color: var(--soft); font: inherit; font-weight: 700; cursor: pointer; }
+    .copy-editor-toolbar button.primary { border-color: rgba(98, 230, 255, 0.58); background: var(--cyan); color: #031018; }
+    .copy-editor-toolbar button:hover { border-color: rgba(98, 230, 255, 0.62); }
+    [data-copy-editable="true"] { transition: outline-color 160ms ease, background 160ms ease; }
+    body.copy-editing [data-copy-editable="true"] { outline: 1px dashed rgba(98, 230, 255, 0.26); outline-offset: 4px; cursor: text; }
+    body.copy-editing [data-copy-editable="true"]:hover, body.copy-editing [data-copy-editable="true"]:focus { outline-color: rgba(98, 230, 255, 0.85); background: rgba(98, 230, 255, 0.07); }
     .report-hero { position: relative; overflow: hidden; padding: 68px 28px 42px; background: linear-gradient(135deg, rgba(7, 16, 25, 0.92), rgba(11, 31, 48, 0.94)); border-bottom: 1px solid var(--line); }
     .report-hero::after { content: ""; position: absolute; inset: auto 0 0; height: 1px; background: linear-gradient(90deg, transparent, var(--cyan), var(--amber), transparent); opacity: 0.85; }
     .hero-inner { position: relative; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(380px, 0.95fr); gap: 36px; align-items: end; max-width: 1180px; margin: 0 auto; }
@@ -192,6 +202,8 @@
     .detailed-performance { max-width: 1180px; margin: 0 auto 54px; padding: 30px 28px 0; }
     @media (max-width: 900px) {
       .report-hero { padding: 34px 18px 24px; }
+      .copy-editor-toolbar { align-items: stretch; flex-direction: column; padding: 10px 12px; }
+      .copy-editor-actions { flex-wrap: wrap; }
       .hero-inner { grid-template-columns: 1fr; gap: 18px; }
       h1 { font-size: 36px; }
       .hero-copy p { font-size: 16px; }
@@ -233,6 +245,14 @@
   </style>
 </head>
 <body data-page="detail">
+  <div class="copy-editor-toolbar" data-editor-toolbar>
+    <div><b>文字編輯工具</b> <span id="copyEditorStatus">編輯關閉｜已修改 0 處</span></div>
+    <div class="copy-editor-actions">
+      <button id="toggleCopyEditor" class="primary" type="button">開啟編輯</button>
+      <button id="exportCopyJson" type="button">輸出 JSON</button>
+      <button id="clearCopyEdits" type="button">清除暫存</button>
+    </div>
+  </div>
   
   <header class="report-hero">
     <div class="hero-inner">
@@ -806,6 +826,207 @@
         item.addEventListener('focus', () => setActive(metric));
         item.addEventListener('blur', clearActive);
       });
+    }
+
+    const copyEditorState = {
+      initialized: false,
+      editing: false,
+      edits: {},
+      storageKey: `apex-sox-copy-edits:${document.body.dataset.page || 'page'}`,
+    };
+
+    function cleanEditorText(value) {
+      return String(value || '').replace(/\u00a0/g, ' ').replace(/\r\n/g, '\n').trim();
+    }
+
+    function getCopyEditableElements() {
+      const selectors = [
+        '.report-hero h1',
+        '.hero-copy p',
+        '.hero-meta span',
+        '.hero-stat span',
+        '.strategy-thesis .eyebrow',
+        '.thesis-copy h2',
+        '.thesis-copy p',
+        '.factor-card span',
+        '.factor-card h3',
+        '.factor-card p',
+        '.detail-header .eyebrow',
+        '.detail-header h2',
+        '.chart-intro .eyebrow',
+        '.chart-intro h2',
+        '.section-heading .eyebrow',
+        '.section-heading h2',
+        '.outcome-card span',
+        '.compact-head span',
+        '.compact-head strong',
+        '.compact-row span:first-child',
+        '.trade-title',
+        '.trade-total span',
+        '.trade-list span',
+        '.trade-summary p',
+        '.rules h2',
+        '.rule-help',
+        '.rule-table th',
+        '.rule-table td:not(.amount-cell)',
+        '.parameter-analysis h2',
+        '.parameter-help',
+        '.strategy-details .eyebrow',
+        '.strategy-details h2',
+        '.strategy-details p',
+        '.detailed-performance .comparison-head span',
+        '.detailed-performance .comparison-head strong',
+        '.detailed-performance .comparison-row span:first-child',
+        '.comparison-footnote',
+        '.nav-button',
+        '.note',
+      ];
+      const nodes = selectors.flatMap(selector => [...document.querySelectorAll(selector)]);
+      return [...new Set(nodes)].filter(element => (
+        cleanEditorText(element.innerText || element.textContent)
+        && !element.closest('[data-editor-toolbar]')
+        && !element.closest('#chart')
+        && !['INPUT', 'BUTTON', 'SCRIPT', 'STYLE'].includes(element.tagName)
+      ));
+    }
+
+    function getCopyEditorContext(element) {
+      const section = element.closest('section, header');
+      const heading = section?.querySelector('h1, h2');
+      const sectionName = heading && heading !== element ? cleanEditorText(heading.innerText) : '';
+      return [section?.className || section?.tagName?.toLowerCase() || 'body', sectionName].filter(Boolean).join(' / ');
+    }
+
+    function loadCopyEdits() {
+      try {
+        copyEditorState.edits = JSON.parse(localStorage.getItem(copyEditorState.storageKey) || '{}') || {};
+      } catch (error) {
+        copyEditorState.edits = {};
+      }
+    }
+
+    function saveCopyEdits() {
+      localStorage.setItem(copyEditorState.storageKey, JSON.stringify(copyEditorState.edits));
+      updateCopyEditorStatus();
+    }
+
+    function updateCopyEditorStatus() {
+      const status = document.getElementById('copyEditorStatus');
+      if (!status) return;
+      const changedCount = Object.values(copyEditorState.edits).filter(edit => edit && edit.changed).length;
+      status.textContent = `${copyEditorState.editing ? '編輯中' : '編輯關閉'}｜已修改 ${changedCount} 處`;
+    }
+
+    function refreshCopyEditableText() {
+      const elements = getCopyEditableElements();
+      elements.forEach((element, index) => {
+        const key = `copy-${String(index + 1).padStart(3, '0')}`;
+        const originalText = element.dataset.copyOriginal || cleanEditorText(element.innerText || element.textContent);
+        element.dataset.copyKey = key;
+        element.dataset.copyOriginal = originalText;
+        element.dataset.copyContext = getCopyEditorContext(element);
+        const saved = copyEditorState.edits[key];
+        if (saved && saved.text && document.activeElement !== element) {
+          element.innerText = saved.text;
+        }
+        element.dataset.copyEditable = 'true';
+        element.contentEditable = copyEditorState.editing ? 'true' : 'false';
+        element.spellcheck = false;
+        if (!element.dataset.copyEditorBound) {
+          element.dataset.copyEditorBound = 'true';
+          element.addEventListener('input', () => {
+            const text = cleanEditorText(element.innerText);
+            const original = element.dataset.copyOriginal || '';
+            copyEditorState.edits[element.dataset.copyKey] = {
+              key: element.dataset.copyKey,
+              tag: element.tagName.toLowerCase(),
+              context: element.dataset.copyContext || '',
+              originalText: original,
+              text,
+              changed: text !== original,
+            };
+            saveCopyEdits();
+          });
+          element.addEventListener('paste', event => {
+            event.preventDefault();
+            const text = event.clipboardData?.getData('text/plain') || '';
+            document.execCommand('insertText', false, text);
+          });
+        }
+      });
+      document.body.classList.toggle('copy-editing', copyEditorState.editing);
+      updateCopyEditorStatus();
+    }
+
+    function setCopyEditing(enabled) {
+      copyEditorState.editing = enabled;
+      const toggle = document.getElementById('toggleCopyEditor');
+      if (toggle) toggle.textContent = enabled ? '關閉編輯' : '開啟編輯';
+      refreshCopyEditableText();
+    }
+
+    function exportCopyJson() {
+      refreshCopyEditableText();
+      const entries = getCopyEditableElements().map(element => {
+        const originalText = element.dataset.copyOriginal || '';
+        const text = cleanEditorText(element.innerText);
+        return {
+          key: element.dataset.copyKey,
+          tag: element.tagName.toLowerCase(),
+          context: element.dataset.copyContext || '',
+          originalText,
+          text,
+          changed: text !== originalText,
+        };
+      });
+      const payload = {
+        schemaVersion: 1,
+        source: 'apex-sox-copy-editor',
+        pageType: document.body.dataset.page || '',
+        path: window.location.pathname,
+        exportedAt: new Date().toISOString(),
+        changedEdits: entries.filter(entry => entry.changed),
+        allEditableText: entries,
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+      link.href = url;
+      link.download = `apex-sox-copy-${payload.pageType || 'page'}-${stamp}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function clearCopyEdits() {
+      copyEditorState.edits = {};
+      localStorage.removeItem(copyEditorState.storageKey);
+      getCopyEditableElements().forEach(element => {
+        if (element.dataset.copyOriginal) element.innerText = element.dataset.copyOriginal;
+      });
+      refreshCopyEditableText();
+    }
+
+    function setupCopyEditor() {
+      if (copyEditorState.initialized) {
+        refreshCopyEditableText();
+        return;
+      }
+      const toolbar = document.querySelector('[data-editor-toolbar]');
+      if (!toolbar) return;
+      copyEditorState.initialized = true;
+      loadCopyEdits();
+      document.getElementById('toggleCopyEditor')?.addEventListener('click', () => setCopyEditing(!copyEditorState.editing));
+      document.getElementById('exportCopyJson')?.addEventListener('click', exportCopyJson);
+      document.getElementById('clearCopyEdits')?.addEventListener('click', clearCopyEdits);
+      document.addEventListener('click', event => {
+        if (copyEditorState.editing && event.target.closest('a[data-copy-editable]')) {
+          event.preventDefault();
+        }
+      }, true);
+      refreshCopyEditableText();
     }
 
     function readableBuyNote(note) {
@@ -1399,6 +1620,7 @@
           window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
         }
         status.textContent = '';
+        if (copyEditorState.initialized) refreshCopyEditableText();
       } catch (error) {
         status.textContent = error.message;
       }
@@ -1433,6 +1655,7 @@
       Plotly.react('chart', payload.traces, payload.layout, { responsive: true, displaylogo: false, scrollZoom: true });
       if (document.getElementById('parameterHeatmap')) renderParameterCharts(result);
     }
+    setupCopyEditor();
   </script>
 
 </body>
