@@ -330,6 +330,7 @@
           <div class="compact-row" data-metric="final-value" tabindex="0"><span>最終資產</span><b>$15,354,549</b><b>$11,506,029</b><b class="diff-neutral">+3,848,520</b></div>
           <div class="compact-row" data-metric="cost" tabindex="0"><span>總投入</span><b>$1,281,250</b><b>$945,000</b><b class="diff-neutral">+336,250</b></div>
           <div class="compact-row emphasis" data-metric="xirr" tabindex="0"><span>年化 XIRR</span><b>28.27%</b><b>28.02%</b><b class="diff-positive">+0.25%</b></div>
+          <div class="compact-row" data-metric="buy-frequency" tabindex="0"><span>買入頻率</span><b>14.4 次／年</b><b>12.1 次／年</b><b class="diff-neutral">+2.4 次／年</b></div>
         </div>
       </div>
       
@@ -744,6 +745,9 @@
       const standardCount = result.buys.filter(buy => buy.Type === 'STD Level Buy').length;
       const sniperCount = result.buys.filter(buy => buy.Type === 'Sniper Shot').length;
       const monthHasBuy = result.buys.some(buy => buy.Date.slice(0, 7) === m.finalDate.slice(0, 7));
+      const stratBuyFrequency = result.buys.length / years;
+      const dcaBuyFrequency = (m.costDca / strategyConfig.baseAmount) / years;
+      const buyFrequencyDiff = stratBuyFrequency - dcaBuyFrequency;
       const subtitle = document.querySelector('.subtitle');
       const heroFinalValue = document.querySelector('#heroFinalValue');
       const heroCost = document.querySelector('#heroCost');
@@ -785,7 +789,7 @@
               </article>
               <article class="outcome-card" data-metric="buy-frequency" tabindex="0">
                 <span>買入頻率</span>
-                <b>${(result.buys.length / years).toFixed(1)} 次／年</b>
+                <b>${stratBuyFrequency.toFixed(1)} 次／年</b>
                 <small>累計 ${intFmt.format(result.buys.length)} 次買入</small>
               </article>
             </div>
@@ -794,6 +798,7 @@
               <div class="compact-row" data-metric="final-value" tabindex="0"><span>最終資產</span><b>${money(m.finalValStrat)}</b><b>${money(m.finalValDca)}</b><b class="diff-neutral">${signedIntFmt.format(finalValueDiff)}</b></div>
               <div class="compact-row" data-metric="cost" tabindex="0"><span>總投入</span><b>${money(m.costStrat)}</b><b>${money(m.costDca)}</b><b class="diff-neutral">${signedIntFmt.format(costDiff)}</b></div>
               <div class="compact-row emphasis" data-metric="xirr" tabindex="0"><span>年化 XIRR</span><b>${pct(m.xirrStrat)}</b><b>${pct(m.xirrDca)}</b><b class="${diffClass(m.xirrDiff)}">${signedPct(m.xirrDiff)}</b></div>
+              <div class="compact-row" data-metric="buy-frequency" tabindex="0"><span>買入頻率</span><b>${stratBuyFrequency.toFixed(1)} 次／年</b><b>${dcaBuyFrequency.toFixed(1)} 次／年</b><b class="diff-neutral">${buyFrequencyDiff >= 0 ? '+' : ''}${buyFrequencyDiff.toFixed(1)} 次／年</b></div>
             </div>
           </div>
           ${isDetailPage ? `
@@ -809,7 +814,7 @@
             <p>狙擊條件：VIX &gt; ${strategyConfig.vixPanicThreshold} 且 RMDD 跌破對應防線。</p>
             <div class="annual-section">
               <div class="trade-title">交易訊號統計</div>
-              <div class="annual-total"><b>${(result.buys.length / years).toFixed(1)}</b><span>次／年</span></div>
+              <div class="annual-total"><b>${stratBuyFrequency.toFixed(1)}</b><span>次／年</span></div>
               <div class="trade-list annual-list">
                 <div class="trade-list-head"><span></span><span></span><small>年均</small></div>
                 <div><i class="fallback-dot"></i><span>保底買入</span><em>${(fallbackCount / years).toFixed(1)}</em></div>

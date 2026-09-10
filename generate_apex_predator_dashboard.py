@@ -1056,6 +1056,9 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
       const standardCount = result.buys.filter(buy => buy.Type === 'STD Level Buy').length;
       const sniperCount = result.buys.filter(buy => buy.Type === 'Sniper Shot').length;
       const monthHasBuy = result.buys.some(buy => buy.Date.slice(0, 7) === m.finalDate.slice(0, 7));
+      const stratBuyFrequency = result.buys.length / years;
+      const dcaBuyFrequency = (m.costDca / strategyConfig.baseAmount) / years;
+      const buyFrequencyDiff = stratBuyFrequency - dcaBuyFrequency;
       const subtitle = document.querySelector('.subtitle');
       const heroFinalValue = document.querySelector('#heroFinalValue');
       const heroCost = document.querySelector('#heroCost');
@@ -1097,7 +1100,7 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
               </article>
               <article class="outcome-card" data-metric="buy-frequency" tabindex="0">
                 <span>買入頻率</span>
-                <b>${(result.buys.length / years).toFixed(1)} 次／年</b>
+                <b>${stratBuyFrequency.toFixed(1)} 次／年</b>
                 <small>累計 ${intFmt.format(result.buys.length)} 次買入</small>
               </article>
             </div>
@@ -1106,6 +1109,7 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
               <div class="compact-row" data-metric="final-value" tabindex="0"><span>最終資產</span><b>${money(m.finalValStrat)}</b><b>${money(m.finalValDca)}</b><b class="diff-neutral">${signedIntFmt.format(finalValueDiff)}</b></div>
               <div class="compact-row" data-metric="cost" tabindex="0"><span>總投入</span><b>${money(m.costStrat)}</b><b>${money(m.costDca)}</b><b class="diff-neutral">${signedIntFmt.format(costDiff)}</b></div>
               <div class="compact-row emphasis" data-metric="xirr" tabindex="0"><span>年化 XIRR</span><b>${pct(m.xirrStrat)}</b><b>${pct(m.xirrDca)}</b><b class="${diffClass(m.xirrDiff)}">${signedPct(m.xirrDiff)}</b></div>
+              <div class="compact-row" data-metric="buy-frequency" tabindex="0"><span>買入頻率</span><b>${stratBuyFrequency.toFixed(1)} 次／年</b><b>${dcaBuyFrequency.toFixed(1)} 次／年</b><b class="diff-neutral">${buyFrequencyDiff >= 0 ? '+' : ''}${buyFrequencyDiff.toFixed(1)} 次／年</b></div>
             </div>
           </div>
           ${isDetailPage ? `
@@ -1121,7 +1125,7 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
             <p>狙擊條件：VIX &gt; ${strategyConfig.vixPanicThreshold} 且 RMDD 跌破對應防線。</p>
             <div class="annual-section">
               <div class="trade-title">交易訊號統計</div>
-              <div class="annual-total"><b>${(result.buys.length / years).toFixed(1)}</b><span>次／年</span></div>
+              <div class="annual-total"><b>${stratBuyFrequency.toFixed(1)}</b><span>次／年</span></div>
               <div class="trade-list annual-list">
                 <div class="trade-list-head"><span></span><span></span><small>年均</small></div>
                 <div><i class="fallback-dot"></i><span>保底買入</span><em>${(fallbackCount / years).toFixed(1)}</em></div>
@@ -1742,6 +1746,9 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     annualized_absolute_diff = annualized_absolute_strat - annualized_absolute_dca
     absolute_return_diff = absolute_return_strat - absolute_return_dca
     total_xirr_diff = total_xirr_strat - total_xirr_dca
+    strat_buy_frequency = len(buys) / years
+    dca_buy_frequency = (metrics["cost_dca"] / CONFIG["BASE_AMOUNT"]) / years
+    buy_frequency_diff = strat_buy_frequency - dca_buy_frequency
 
     def difference_class(value: float) -> str:
         if value > 0:
@@ -1945,7 +1952,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
           </article>
           <article class="outcome-card" data-metric="buy-frequency" tabindex="0">
             <span>買入頻率</span>
-            <b>{len(buys) / years:.1f} 次／年</b>
+            <b>{strat_buy_frequency:.1f} 次／年</b>
             <small>累計 {len(buys):,} 次買入</small>
           </article>
         </div>
@@ -1954,6 +1961,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
           <div class="compact-row" data-metric="final-value" tabindex="0"><span>最終資產</span><b>{money(metrics['final_val_strat'])}</b><b>{money(metrics['final_val_dca'])}</b><b class="diff-neutral">{final_value_diff:+,.0f}</b></div>
           <div class="compact-row" data-metric="cost" tabindex="0"><span>總投入</span><b>{money(metrics['cost_strat'])}</b><b>{money(metrics['cost_dca'])}</b><b class="diff-neutral">{cost_diff:+,.0f}</b></div>
           <div class="compact-row emphasis" data-metric="xirr" tabindex="0"><span>年化 XIRR</span><b>{pct(metrics['xirr_strat'])}</b><b>{pct(metrics['xirr_dca'])}</b><b class="{difference_class(metrics['xirr_diff'])}">{metrics['xirr_diff']:+.2f}%</b></div>
+          <div class="compact-row" data-metric="buy-frequency" tabindex="0"><span>買入頻率</span><b>{strat_buy_frequency:.1f} 次／年</b><b>{dca_buy_frequency:.1f} 次／年</b><b class="diff-neutral">{buy_frequency_diff:+.1f} 次／年</b></div>
         </div>
       </div>
       {trade_summary_html}
