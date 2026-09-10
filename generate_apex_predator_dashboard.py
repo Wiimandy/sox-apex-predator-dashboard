@@ -1073,7 +1073,7 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
         <div class="section-heading">
           <div>
             <span class="eyebrow">策略績效摘要</span>
-            <h2>Apex Predator 與純定期定額</h2>
+            <h2>Apex-SOX 策略 vs 純定期定額策略</h2>
           </div>
           <div class="period">${m.startDate} 至 ${m.finalDate}<span>約 ${years.toFixed(1)} 年</span></div>
         </div>
@@ -1921,7 +1921,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     <div class="section-heading">
       <div>
         <span class="eyebrow">策略績效摘要</span>
-        <h2>Apex Predator 與純定期定額</h2>
+        <h2>Apex-SOX 策略 vs 純定期定額策略</h2>
       </div>
       <div class="period">{start_date.date()} 至 {metrics['final_date'].date()}<span>約 {years:.1f} 年</span></div>
     </div>
