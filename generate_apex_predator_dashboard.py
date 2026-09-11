@@ -1994,12 +1994,25 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
         if not is_detail
         else '<div class="hero-actions"><a class="nav-button" href="index.html">返回 Pitch 頁</a></div>'
     )
+    if is_detail:
+        hero_title_html = "SOX 定投策略 -<br>Apex Strategy"
+        hero_description = "這是一個以美股四大指數之一的費城半導體指數（簡稱 SOX）為標的，並根據市場回撤、市場恐慌程度（VIX）動態加碼的長期投資策略。"
+        thesis_heading_html = "市場回撤深度決定加碼程度、<br>恐慌程度辨識狙擊時點"
+        thesis_body = "這份 Dashboard 把策略績效、買入事件與市場狀態放在同一張互動圖表中，方便快速比較 Apex Strategy 與純定期定額的長期結果。"
+        vix_factor_title = "恐慌指數 VIX"
+    else:
+        hero_title_html = "SOX 定投策略 －<br>Apex Strategy"
+        hero_description = "這是一個以美國股市－費城半導體指數（簡稱SOX）為標的，並且根據市場回撤與市場恐慌程度（VIX）動態加碼的長期投資策略。"
+        thesis_heading_html = "市場回撤深度決定加碼程度；市場恐慌程度辨識狙擊時點。"
+        thesis_body = "這份 Dashboard 把策略績效、買入事件與市場狀態放在同一張互動圖表中，方便快速比較 Apex Predator 與純定期定額的長期結果。"
+        vix_factor_title = "恐慌程度 VIX"
+    page_title = "SOX 定投策略 - Apex Strategy"
     report_summary = f"""
   <header class="report-hero">
     <div class="hero-inner">
       <div class="hero-copy">
-        <h1>費城半導體ETF 加碼策略</h1>
-        <p>這是一個以美國股市－費城半導體指數（簡稱SOX）為標的，並且根據市場回撤與市場恐慌程度（VIX）動態加碼的長期投資策略。</p>
+        <h1>{hero_title_html}</h1>
+        <p>{hero_description}</p>
         <div class="hero-meta">
           <span class="subtitle">{subtitle}</span>
           <span>{start_date.date()} 至 {metrics['final_date'].date()}</span>
@@ -2030,23 +2043,23 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
   <section class="strategy-thesis">
     <div class="thesis-copy">
       <span class="eyebrow">策略三大因子</span>
-      <h2>市場回撤深度決定加碼程度；市場恐慌程度辨識狙擊時點。</h2>
-      <p>這份 Dashboard 把策略績效、買入事件與市場狀態放在同一張互動圖表中，方便快速比較 Apex Predator 與純定期定額的長期結果。</p>
+      <h2>{thesis_heading_html}</h2>
+      <p>{thesis_body}</p>
     </div>
     <div class="factor-grid">
       <article class="factor-card">
         <span>01</span>
-        <h3>RMDD</h3>
+        <h3>滾動回撤幅度 RMDD</h3>
         <p>跌破預設回撤防線時，啟動標準加碼。</p>
       </article>
       <article class="factor-card">
         <span>02</span>
-        <h3>VIX</h3>
+        <h3>{vix_factor_title}</h3>
         <p>市場進入恐慌區時，搭配深層回撤觸發狙擊買入。</p>
       </article>
       <article class="factor-card">
         <span>03</span>
-        <h3>Seasonality</h3>
+        <h3>季節效應</h3>
         <p>10 月保底買入提高至 1.5 份，反映季節性回落特徵。</p>
       </article>
     </div>
@@ -2227,7 +2240,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>費城半導體ETF 加碼策略</title>
+  <title>{page_title}</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="site.webmanifest">
