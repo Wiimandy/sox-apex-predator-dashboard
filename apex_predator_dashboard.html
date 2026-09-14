@@ -1147,13 +1147,14 @@
       if (heroXirr) heroXirr.textContent = pct(m.xirrStrat);
       if (heroBuyCount) heroBuyCount.textContent = intFmt.format(result.buys.length);
       const isDetailPage = document.body.dataset.page === 'detail';
+      const performanceHeading = isDetailPage ? 'Apex-SOX 策略 vs 純定期定額策略' : 'Apex 策略 vs 純定期定額策略';
 
       document.querySelector('.performance').innerHTML = `
         ${isDetailPage ? renderSignalPanels(result) : ''}
         <div class="section-heading">
           <div>
             <span class="eyebrow">策略績效摘要</span>
-            <h2>Apex-SOX 策略 vs 純定期定額策略</h2>
+            <h2>${performanceHeading}</h2>
           </div>
           <div class="period">${m.startDate} 至 ${m.finalDate}<span>約 ${years.toFixed(1)} 年</span></div>
         </div>

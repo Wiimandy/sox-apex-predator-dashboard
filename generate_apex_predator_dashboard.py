@@ -1271,13 +1271,14 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
       if (heroXirr) heroXirr.textContent = pct(m.xirrStrat);
       if (heroBuyCount) heroBuyCount.textContent = intFmt.format(result.buys.length);
       const isDetailPage = document.body.dataset.page === 'detail';
+      const performanceHeading = isDetailPage ? 'Apex-SOX 策略 vs 純定期定額策略' : 'Apex 策略 vs 純定期定額策略';
 
       document.querySelector('.performance').innerHTML = `
         ${isDetailPage ? renderSignalPanels(result) : ''}
         <div class="section-heading">
           <div>
             <span class="eyebrow">策略績效摘要</span>
-            <h2>Apex-SOX 策略 vs 純定期定額策略</h2>
+            <h2>${performanceHeading}</h2>
           </div>
           <div class="period">${m.startDate} 至 ${m.finalDate}<span>約 ${years.toFixed(1)} 年</span></div>
         </div>
@@ -2000,12 +2001,24 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
         thesis_heading_html = "市場回撤深度決定加碼程度、<br>恐慌程度辨識狙擊時點"
         thesis_body = "這份 Dashboard 把策略績效、買入事件與市場狀態放在同一張互動圖表中，方便快速比較 Apex Strategy 與純定期定額的長期結果。"
         vix_factor_title = "恐慌指數 VIX"
+        rmdd_factor_body = "跌破預設回撤防線時，啟動標準加碼。"
+        vix_factor_body = "市場進入恐慌區時，搭配深層回撤觸發狙擊買入。"
+        seasonality_factor_body = "10 月保底買入提高至 1.5 份，反映季節性回落特徵。"
+        performance_heading = "Apex-SOX 策略 vs 純定期定額策略"
+        chart_intro_heading = "先看長期曲線，再決定要不要深入規則。"
+        chart_note = f"互動提示：拖曳可放大區間，雙擊可重設；右側圖例可點擊開關線條。｜{source_details}"
     else:
-        hero_title_html = "SOX 定投策略 －<br>Apex Strategy"
-        hero_description = "這是一個以美國股市－費城半導體指數（簡稱SOX）為標的，並且根據市場回撤與市場恐慌程度（VIX）動態加碼的長期投資策略。"
-        thesis_heading_html = "市場回撤深度決定加碼程度；市場恐慌程度辨識狙擊時點。"
-        thesis_body = "這份 Dashboard 把策略績效、買入事件與市場狀態放在同一張互動圖表中，方便快速比較 Apex Predator 與純定期定額的長期結果。"
+        hero_title_html = "SOX 定投策略<br>Apex Strategy"
+        hero_description = "策略以美股－費城半導體指數（簡稱SOX）為標的，並根據市場回撤與市場恐慌程度（VIX），進行加碼的長期投資策略。"
+        thesis_heading_html = "回撤深度決定加碼多少；恐慌程度辨識狙擊時點。"
+        thesis_body = "白話文：指數跌愈多愈買，如果跌到市場非常恐慌，會進行狙擊加碼。每個月的加碼份數也會因為統計規律會有所變動。"
         vix_factor_title = "恐慌程度 VIX"
+        rmdd_factor_body = "跌破回撤防線時，啟動「標準加碼」"
+        vix_factor_body = "市場進入恐慌區時，搭配回撤訊號，觸發「狙擊買入」"
+        seasonality_factor_body = "美股有明顯的季節效應，所以不同月份加碼份數會有所不同"
+        performance_heading = "Apex 策略 vs 純定期定額策略"
+        chart_intro_heading = "美股 & 半導體一路向上，回撤就是買點"
+        chart_note = f"互動提示：拖曳可放大區間，雙擊可重設；右側圖例可點擊開關線條。<br>{source_details}"
     page_title = "SOX 定投策略 - Apex Strategy"
     report_summary = f"""
   <header class="report-hero">
@@ -2050,17 +2063,17 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
       <article class="factor-card">
         <span>01</span>
         <h3>滾動回撤幅度 RMDD</h3>
-        <p>跌破預設回撤防線時，啟動標準加碼。</p>
+        <p>{rmdd_factor_body}</p>
       </article>
       <article class="factor-card">
         <span>02</span>
         <h3>{vix_factor_title}</h3>
-        <p>市場進入恐慌區時，搭配深層回撤觸發狙擊買入。</p>
+        <p>{vix_factor_body}</p>
       </article>
       <article class="factor-card">
         <span>03</span>
         <h3>季節效應</h3>
-        <p>10 月保底買入提高至 1.5 份，反映季節性回落特徵。</p>
+        <p>{seasonality_factor_body}</p>
       </article>
     </div>
   </section>
@@ -2144,7 +2157,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     <div class="section-heading">
       <div>
         <span class="eyebrow">策略績效摘要</span>
-        <h2>Apex-SOX 策略 vs 純定期定額策略</h2>
+        <h2>{performance_heading}</h2>
       </div>
       <div class="period">{start_date.date()} 至 {metrics['final_date'].date()}<span>約 {years:.1f} 年</span></div>
     </div>
@@ -2218,11 +2231,11 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     </div>
   </section>
 """
-    pitch_chart_intro = """
+    pitch_chart_intro = f"""
   <section class="chart-intro">
     <div>
       <span class="eyebrow">互動式回測圖表</span>
-      <h2>先看長期曲線，再決定要不要深入規則。</h2>
+      <h2>{chart_intro_heading}</h2>
     </div>
     <a class="nav-button primary" href="apex_predator_dashboard.html">查看完整策略細節</a>
   </section>
@@ -2495,7 +2508,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
   {performance_summary}
   {pre_chart_sections}
   <div id="chart"></div>
-  <div class="note">互動提示：拖曳可放大區間，雙擊可重設；右側圖例可點擊開關線條。｜{source_details}</div>
+  <div class="note">{chart_note}</div>
   {post_chart_sections}
   {interactive_script}
 </body>

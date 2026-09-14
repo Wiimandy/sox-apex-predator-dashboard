@@ -257,8 +257,8 @@
   <header class="report-hero">
     <div class="hero-inner">
       <div class="hero-copy">
-        <h1>SOX 定投策略 －<br>Apex Strategy</h1>
-        <p>這是一個以美國股市－費城半導體指數（簡稱SOX）為標的，並且根據市場回撤與市場恐慌程度（VIX）動態加碼的長期投資策略。</p>
+        <h1>SOX 定投策略<br>Apex Strategy</h1>
+        <p>策略以美股－費城半導體指數（簡稱SOX）為標的，並根據市場回撤與市場恐慌程度（VIX），進行加碼的長期投資策略。</p>
         <div class="hero-meta">
           <span class="subtitle">最新資料日：2026-09-11</span>
           <span>2011-01-03 至 2026-09-11</span>
@@ -289,24 +289,24 @@
   <section class="strategy-thesis">
     <div class="thesis-copy">
       <span class="eyebrow">策略三大因子</span>
-      <h2>市場回撤深度決定加碼程度；市場恐慌程度辨識狙擊時點。</h2>
-      <p>這份 Dashboard 把策略績效、買入事件與市場狀態放在同一張互動圖表中，方便快速比較 Apex Predator 與純定期定額的長期結果。</p>
+      <h2>回撤深度決定加碼多少；恐慌程度辨識狙擊時點。</h2>
+      <p>白話文：指數跌愈多愈買，如果跌到市場非常恐慌，會進行狙擊加碼。每個月的加碼份數也會因為統計規律會有所變動。</p>
     </div>
     <div class="factor-grid">
       <article class="factor-card">
         <span>01</span>
         <h3>滾動回撤幅度 RMDD</h3>
-        <p>跌破預設回撤防線時，啟動標準加碼。</p>
+        <p>跌破回撤防線時，啟動「標準加碼」</p>
       </article>
       <article class="factor-card">
         <span>02</span>
         <h3>恐慌程度 VIX</h3>
-        <p>市場進入恐慌區時，搭配深層回撤觸發狙擊買入。</p>
+        <p>市場進入恐慌區時，搭配回撤訊號，觸發「狙擊買入」</p>
       </article>
       <article class="factor-card">
         <span>03</span>
         <h3>季節效應</h3>
-        <p>10 月保底買入提高至 1.5 份，反映季節性回落特徵。</p>
+        <p>美股有明顯的季節效應，所以不同月份加碼份數會有所不同</p>
       </article>
     </div>
   </section>
@@ -317,7 +317,7 @@
     <div class="section-heading">
       <div>
         <span class="eyebrow">策略績效摘要</span>
-        <h2>Apex-SOX 策略 vs 純定期定額策略</h2>
+        <h2>Apex 策略 vs 純定期定額策略</h2>
       </div>
       <div class="period">2011-01-03 至 2026-09-11<span>約 15.7 年</span></div>
     </div>
@@ -361,13 +361,13 @@
   <section class="chart-intro">
     <div>
       <span class="eyebrow">互動式回測圖表</span>
-      <h2>先看長期曲線，再決定要不要深入規則。</h2>
+      <h2>美股 & 半導體一路向上，回撤就是買點</h2>
     </div>
     <a class="nav-button primary" href="apex_predator_dashboard.html">查看完整策略細節</a>
   </section>
 
   <div id="chart"></div>
-  <div class="note">互動提示：拖曳可放大區間，雙擊可重設；右側圖例可點擊開關線條。｜資料來源：Yahoo Finance｜原始 ticker：^SOX, TWD=X, ^GSPC, ^VIX, ^IXIC</div>
+  <div class="note">互動提示：拖曳可放大區間，雙擊可重設；右側圖例可點擊開關線條。<br>資料來源：Yahoo Finance｜原始 ticker：^SOX, TWD=X, ^GSPC, ^VIX, ^IXIC</div>
   
   
   <script>
@@ -980,13 +980,14 @@
       if (heroXirr) heroXirr.textContent = pct(m.xirrStrat);
       if (heroBuyCount) heroBuyCount.textContent = intFmt.format(result.buys.length);
       const isDetailPage = document.body.dataset.page === 'detail';
+      const performanceHeading = isDetailPage ? 'Apex-SOX 策略 vs 純定期定額策略' : 'Apex 策略 vs 純定期定額策略';
 
       document.querySelector('.performance').innerHTML = `
         ${isDetailPage ? renderSignalPanels(result) : ''}
         <div class="section-heading">
           <div>
             <span class="eyebrow">策略績效摘要</span>
-            <h2>Apex-SOX 策略 vs 純定期定額策略</h2>
+            <h2>${performanceHeading}</h2>
           </div>
           <div class="period">${m.startDate} 至 ${m.finalDate}<span>約 ${years.toFixed(1)} 年</span></div>
         </div>
