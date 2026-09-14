@@ -352,15 +352,15 @@
             <b>+3,813,858</b>
             <small>Apex Predator $15,216,437 / 純 DCA $11,402,579</small>
           </article>
-          <article class="outcome-card" data-metric="xirr" tabindex="0">
-            <span>年化 XIRR 差距</span>
-            <b class="diff-positive">+0.25%</b>
-            <small>28.16% vs 27.91%</small>
-          </article>
           <article class="outcome-card" data-metric="cost" tabindex="0">
             <span>總投入差額</span>
             <b>+336,250</b>
             <small>$1,281,250 vs $945,000</small>
+          </article>
+          <article class="outcome-card" data-metric="xirr" tabindex="0">
+            <span>年化 XIRR 差距</span>
+            <b class="diff-positive">+0.25%</b>
+            <small>28.16% vs 27.91%</small>
           </article>
           <article class="outcome-card" data-metric="buy-frequency" tabindex="0">
             <span>買入頻率</span>
@@ -1166,15 +1166,15 @@
                 <b>${signedIntFmt.format(finalValueDiff)}</b>
                 <small>Apex Predator ${money(m.finalValStrat)} / 純 DCA ${money(m.finalValDca)}</small>
               </article>
-              <article class="outcome-card" data-metric="xirr" tabindex="0">
-                <span>年化 XIRR 差距</span>
-                <b class="${diffClass(m.xirrDiff)}">${signedPct(m.xirrDiff)}</b>
-                <small>${pct(m.xirrStrat)} vs ${pct(m.xirrDca)}</small>
-              </article>
               <article class="outcome-card" data-metric="cost" tabindex="0">
                 <span>總投入差額</span>
                 <b>${signedIntFmt.format(costDiff)}</b>
                 <small>${money(m.costStrat)} vs ${money(m.costDca)}</small>
+              </article>
+              <article class="outcome-card" data-metric="xirr" tabindex="0">
+                <span>年化 XIRR 差距</span>
+                <b class="${diffClass(m.xirrDiff)}">${signedPct(m.xirrDiff)}</b>
+                <small>${pct(m.xirrStrat)} vs ${pct(m.xirrDca)}</small>
               </article>
               <article class="outcome-card" data-metric="buy-frequency" tabindex="0">
                 <span>買入頻率</span>

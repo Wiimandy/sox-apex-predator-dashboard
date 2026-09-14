@@ -1290,15 +1290,15 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
                 <b>${signedIntFmt.format(finalValueDiff)}</b>
                 <small>Apex Predator ${money(m.finalValStrat)} / 純 DCA ${money(m.finalValDca)}</small>
               </article>
-              <article class="outcome-card" data-metric="xirr" tabindex="0">
-                <span>年化 XIRR 差距</span>
-                <b class="${diffClass(m.xirrDiff)}">${signedPct(m.xirrDiff)}</b>
-                <small>${pct(m.xirrStrat)} vs ${pct(m.xirrDca)}</small>
-              </article>
               <article class="outcome-card" data-metric="cost" tabindex="0">
                 <span>總投入差額</span>
                 <b>${signedIntFmt.format(costDiff)}</b>
                 <small>${money(m.costStrat)} vs ${money(m.costDca)}</small>
+              </article>
+              <article class="outcome-card" data-metric="xirr" tabindex="0">
+                <span>年化 XIRR 差距</span>
+                <b class="${diffClass(m.xirrDiff)}">${signedPct(m.xirrDiff)}</b>
+                <small>${pct(m.xirrStrat)} vs ${pct(m.xirrDca)}</small>
               </article>
               <article class="outcome-card" data-metric="buy-frequency" tabindex="0">
                 <span>買入頻率</span>
@@ -2169,15 +2169,15 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
             <b>{final_value_diff:+,.0f}</b>
             <small>Apex Predator {money(metrics['final_val_strat'])} / 純 DCA {money(metrics['final_val_dca'])}</small>
           </article>
-          <article class="outcome-card" data-metric="xirr" tabindex="0">
-            <span>年化 XIRR 差距</span>
-            <b class="{difference_class(metrics['xirr_diff'])}">{metrics['xirr_diff']:+.2f}%</b>
-            <small>{pct(metrics['xirr_strat'])} vs {pct(metrics['xirr_dca'])}</small>
-          </article>
           <article class="outcome-card" data-metric="cost" tabindex="0">
             <span>總投入差額</span>
             <b>{cost_diff:+,.0f}</b>
             <small>{money(metrics['cost_strat'])} vs {money(metrics['cost_dca'])}</small>
+          </article>
+          <article class="outcome-card" data-metric="xirr" tabindex="0">
+            <span>年化 XIRR 差距</span>
+            <b class="{difference_class(metrics['xirr_diff'])}">{metrics['xirr_diff']:+.2f}%</b>
+            <small>{pct(metrics['xirr_strat'])} vs {pct(metrics['xirr_dca'])}</small>
           </article>
           <article class="outcome-card" data-metric="buy-frequency" tabindex="0">
             <span>買入頻率</span>
