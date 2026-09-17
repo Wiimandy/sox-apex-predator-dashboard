@@ -2241,6 +2241,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
   </section>
 """
     pre_performance_sections = f"{detail_header}{date_controls}{market_cards}" if is_detail else ""
+    page_report_summary = "" if is_detail else report_summary
     pre_chart_sections = "" if is_detail else pitch_chart_intro
     post_chart_sections = (
         f"{detailed_performance_summary}{rule_table}{parameter_analysis}{strategy_details}"
@@ -2503,7 +2504,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
       <button id="clearCopyEdits" type="button">清除暫存</button>
     </div>
   </div>
-  {report_summary}
+  {page_report_summary}
   {pre_performance_sections}
   {performance_summary}
   {pre_chart_sections}
