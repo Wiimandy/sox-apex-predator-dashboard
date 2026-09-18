@@ -53,6 +53,14 @@
     .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
     .nav-button { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 0 15px; border: 1px solid var(--line); border-radius: 6px; color: var(--soft); text-decoration: none; font-size: 13px; font-weight: 700; }
     .nav-button.primary { color: #031018; background: var(--cyan); border-color: rgba(98, 230, 255, 0.58); }
+    .hero-side { display: grid; gap: 10px; min-width: 0; }
+    .hero-controls { padding: 13px; background: rgba(13, 26, 39, 0.92); border: 1px solid var(--line); border-radius: 8px; }
+    .hero-control-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+    .hero-control-fields label { display: grid; gap: 6px; min-width: 0; color: var(--muted); font-size: 11px; }
+    .hero-control-fields input { width: 100%; height: 35px; min-width: 0; border: 1px solid var(--line); border-radius: 6px; padding: 0 9px; color: var(--text); background: rgba(7, 16, 25, 0.9); font: inherit; font-size: 12px; font-variant-numeric: tabular-nums; }
+    .hero-control-actions { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+    .hero-control-actions button { height: 35px; border: 1px solid rgba(98, 230, 255, 0.42); border-radius: 6px; padding: 0 13px; color: #031018; background: var(--cyan); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .hero-control-actions button.secondary { color: var(--soft); background: transparent; border-color: var(--line); }
     .hero-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
     .hero-stat { min-height: 118px; padding: 18px; background: linear-gradient(180deg, rgba(20, 40, 61, 0.92), rgba(10, 24, 37, 0.92)); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 18px 50px rgba(0, 0, 0, 0.32); }
     .hero-stat:nth-child(1), .hero-stat:nth-child(3) { border-color: rgba(98, 230, 255, 0.34); }
@@ -227,6 +235,11 @@
       .hero-copy p { margin-top: 14px; font-size: 15px; line-height: 1.65; }
       .hero-meta { gap: 8px; margin-top: 18px; }
       .hero-meta span { padding: 6px 9px; }
+      .hero-control-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hero-control-fields label:last-child { grid-column: 1 / -1; }
+      .hero-control-actions { align-items: stretch; flex-wrap: wrap; }
+      .hero-control-actions button { flex: 1 1 120px; }
+      .hero-control-actions .date-status { flex-basis: 100%; }
       .hero-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
       .hero-stat { min-height: 94px; padding: 13px; }
       .hero-stat span { font-size: 10px; }
@@ -1100,11 +1113,15 @@
       const heroCost = document.querySelector('#heroCost');
       const heroXirr = document.querySelector('#heroXirr');
       const heroBuyCount = document.querySelector('#heroBuyCount');
+      const heroPeriod = document.querySelector('#heroPeriod');
+      const heroYears = document.querySelector('#heroYears');
       if (subtitle) subtitle.textContent = `最新資料日：${m.finalDate}`;
       if (heroFinalValue) heroFinalValue.textContent = money(m.finalValStrat);
       if (heroCost) heroCost.textContent = money(m.costStrat);
       if (heroXirr) heroXirr.textContent = pct(m.xirrStrat);
       if (heroBuyCount) heroBuyCount.textContent = intFmt.format(result.buys.length);
+      if (heroPeriod) heroPeriod.textContent = `${m.startDate} 至 ${m.finalDate}`;
+      if (heroYears) heroYears.textContent = `約 ${years.toFixed(1)} 年`;
       const isDetailPage = document.body.dataset.page === 'detail';
       const performanceHeading = isDetailPage ? 'Apex-SOX 策略 vs 純定期定額策略' : 'Apex 策略 vs 純定期定額策略';
 
