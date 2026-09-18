@@ -919,6 +919,18 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
       return 'diff-neutral';
     }
 
+    function accountMdd(values) {
+      const investedValues = values.filter(value => Number.isFinite(value) && value > 0);
+      if (!investedValues.length) return 0;
+      let peak = investedValues[0];
+      let maxDrawdown = 0;
+      investedValues.forEach(value => {
+        peak = Math.max(peak, value);
+        maxDrawdown = Math.min(maxDrawdown, (value / peak - 1) * 100);
+      });
+      return maxDrawdown;
+    }
+
     function renderCards(result) {
       const cards = document.querySelector('.cards');
       if (!cards) return;
@@ -1260,6 +1272,9 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
       const stratBuyFrequency = result.buys.length / years;
       const dcaBuyFrequency = (m.costDca / strategyConfig.baseAmount) / years;
       const buyFrequencyDiff = stratBuyFrequency - dcaBuyFrequency;
+      const stratAccountMdd = accountMdd(result.curve.map(row => row.Strat_Val));
+      const dcaAccountMdd = accountMdd(result.curve.map(row => row.DCA_Val));
+      const accountMddDiff = stratAccountMdd - dcaAccountMdd;
       const subtitle = document.querySelector('.subtitle');
       const heroFinalValue = document.querySelector('#heroFinalValue');
       const heroCost = document.querySelector('#heroCost');
@@ -1312,6 +1327,7 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
               <div class="compact-row" data-metric="cost" tabindex="0"><span>總投入</span><b>${money(m.costStrat)}</b><b>${money(m.costDca)}</b><b class="diff-neutral">${signedIntFmt.format(costDiff)}</b></div>
               <div class="compact-row emphasis" data-metric="xirr" tabindex="0"><span>年化 XIRR</span><b>${pct(m.xirrStrat)}</b><b>${pct(m.xirrDca)}</b><b class="${diffClass(m.xirrDiff)}">${signedPct(m.xirrDiff)}</b></div>
               <div class="compact-row" data-metric="buy-frequency" tabindex="0"><span>買入頻率</span><b>${stratBuyFrequency.toFixed(1)} 次／年</b><b>${dcaBuyFrequency.toFixed(1)} 次／年</b><b class="diff-neutral">${buyFrequencyDiff >= 0 ? '+' : ''}${buyFrequencyDiff.toFixed(1)} 次／年</b></div>
+              <div class="compact-row"><span>帳戶資產 MDD</span><b>${pct(stratAccountMdd)}</b><b>${pct(dcaAccountMdd)}</b><b class="${diffClass(accountMddDiff)}">${signedPct(accountMddDiff)}</b></div>
             </div>
           </div>
           ${isDetailPage ? `
@@ -1954,6 +1970,18 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     dca_buy_frequency = (metrics["cost_dca"] / CONFIG["BASE_AMOUNT"]) / years
     buy_frequency_diff = strat_buy_frequency - dca_buy_frequency
 
+    def account_mdd(values: pd.Series) -> float:
+        invested_values = pd.to_numeric(values, errors="coerce").dropna()
+        invested_values = invested_values[invested_values > 0]
+        if invested_values.empty:
+            return 0.0
+        drawdowns = invested_values / invested_values.cummax() - 1
+        return float(drawdowns.min() * 100)
+
+    strat_account_mdd = account_mdd(curve["Strat_Val"])
+    dca_account_mdd = account_mdd(curve["DCA_Val"])
+    account_mdd_diff = strat_account_mdd - dca_account_mdd
+
     def difference_class(value: float) -> str:
         if value > 0:
             return "diff-positive"
@@ -2191,6 +2219,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
           <div class="compact-row" data-metric="cost" tabindex="0"><span>總投入</span><b>{money(metrics['cost_strat'])}</b><b>{money(metrics['cost_dca'])}</b><b class="diff-neutral">{cost_diff:+,.0f}</b></div>
           <div class="compact-row emphasis" data-metric="xirr" tabindex="0"><span>年化 XIRR</span><b>{pct(metrics['xirr_strat'])}</b><b>{pct(metrics['xirr_dca'])}</b><b class="{difference_class(metrics['xirr_diff'])}">{metrics['xirr_diff']:+.2f}%</b></div>
           <div class="compact-row" data-metric="buy-frequency" tabindex="0"><span>買入頻率</span><b>{strat_buy_frequency:.1f} 次／年</b><b>{dca_buy_frequency:.1f} 次／年</b><b class="diff-neutral">{buy_frequency_diff:+.1f} 次／年</b></div>
+          <div class="compact-row"><span>帳戶資產 MDD</span><b>{pct(strat_account_mdd)}</b><b>{pct(dca_account_mdd)}</b><b class="{difference_class(account_mdd_diff)}">{account_mdd_diff:+.2f}%</b></div>
         </div>
       </div>
       {trade_summary_html}
