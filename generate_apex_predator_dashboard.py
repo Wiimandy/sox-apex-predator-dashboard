@@ -2314,11 +2314,11 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     <a class="nav-button primary" href="apex_predator_dashboard.html">查看完整策略細節</a>
   </section>
 """
-    pre_performance_sections = f"{detail_header}{date_controls}{market_cards}" if is_detail else ""
+    pre_performance_sections = f"{strategy_details}{detail_header}{date_controls}{market_cards}" if is_detail else ""
     page_report_summary = "" if is_detail else report_summary
     pre_chart_sections = "" if is_detail else pitch_chart_intro
     post_chart_sections = (
-        f"{detailed_performance_summary}{rule_table}{parameter_analysis}{strategy_details}"
+        f"{detailed_performance_summary}{rule_table}{parameter_analysis}"
         if is_detail
         else ""
     )
@@ -2527,8 +2527,8 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     .parameter-grid {{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }}
     .parameter-chart {{ min-height: 470px; background: rgba(13, 26, 39, 0.94); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }}
     .parameter-chart.wide {{ grid-column: 1 / -1; min-height: 380px; }}
-    .strategy-details {{ margin-top: 10px; padding: 38px 28px 50px; background: #09131f; border-top: 1px solid var(--line); }}
-    .details-inner {{ max-width: 900px; margin: 0 auto; }}
+    .strategy-details {{ margin-top: 0; padding: 38px 28px 50px; background: #09131f; border-top: 1px solid var(--line); text-align: left; }}
+    .details-inner {{ max-width: 1180px; margin: 0 auto; text-align: left; }}
     .strategy-details h2 {{ margin: 4px 0 14px; color: var(--text); font-size: 24px; }}
     .strategy-details p {{ margin: 0 0 9px; color: var(--soft); font-size: 15px; line-height: 1.8; }}
     .strategy-details b {{ color: var(--cyan); }}

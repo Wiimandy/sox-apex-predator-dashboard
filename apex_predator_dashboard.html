@@ -202,8 +202,8 @@
     .parameter-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
     .parameter-chart { min-height: 470px; background: rgba(13, 26, 39, 0.94); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
     .parameter-chart.wide { grid-column: 1 / -1; min-height: 380px; }
-    .strategy-details { margin-top: 10px; padding: 38px 28px 50px; background: #09131f; border-top: 1px solid var(--line); }
-    .details-inner { max-width: 900px; margin: 0 auto; }
+    .strategy-details { margin-top: 0; padding: 38px 28px 50px; background: #09131f; border-top: 1px solid var(--line); text-align: left; }
+    .details-inner { max-width: 1180px; margin: 0 auto; text-align: left; }
     .strategy-details h2 { margin: 4px 0 14px; color: var(--text); font-size: 24px; }
     .strategy-details p { margin: 0 0 9px; color: var(--soft); font-size: 15px; line-height: 1.8; }
     .strategy-details b { color: var(--cyan); }
@@ -266,6 +266,17 @@
   </div>
   
   
+  <section class="strategy-details">
+    <div class="details-inner">
+      <span class="eyebrow">策略詳細說明</span>
+      <h2>Apex Predator 策略架構</h2>
+      <p>Apex Predator 是一套改良版的 SOX 定期定額加碼策略（DCA），共有三大因子：</p>
+      <p><b>1) RMDD</b>－追蹤 SOX 指數 1 年交易日的高點的回撤，跌破設定的防線（Level）時啟動標準加碼（STD Level Buy）</p>
+      <p><b>2) S&amp;P500 恐慌指數 (VIX)</b>－判斷市場系統性恐慌程度，當 VIX 大於一定程度（市場很恐慌），且 RMDD 跌破深層防線時（且市場跌很深），將額外啟動狙擊加碼（Sniper Shot）</p>
+      <p><b>3) 季節效應</b>－根據歷史資料回測，發現 10 月股市的回落程度顯著，因此在該月月底的基礎加碼（Fallback buy）將上調至 1.5 份。</p>
+    </div>
+  </section>
+
   <section class="detail-header">
     <div>
       <span class="eyebrow">APEX Strategy 資產測試頁面</span>
@@ -478,17 +489,6 @@
       <div id="parameterHeatmap" class="parameter-chart"></div>
       <div id="parameterSurface" class="parameter-chart"></div>
       <div id="rmddSampleDistribution" class="parameter-chart wide"></div>
-    </div>
-  </section>
-
-  <section class="strategy-details">
-    <div class="details-inner">
-      <span class="eyebrow">策略詳細說明</span>
-      <h2>Apex Predator 策略架構</h2>
-      <p>Apex Predator 是一套改良版的 SOX 定期定額加碼策略（DCA），共有三大因子：</p>
-      <p><b>1) RMDD</b>－追蹤 SOX 指數 1 年交易日的高點的回撤，跌破設定的防線（Level）時啟動標準加碼（STD Level Buy）</p>
-      <p><b>2) S&amp;P500 恐慌指數 (VIX)</b>－判斷市場系統性恐慌程度，當 VIX 大於一定程度（市場很恐慌），且 RMDD 跌破深層防線時（且市場跌很深），將額外啟動狙擊加碼（Sniper Shot）</p>
-      <p><b>3) 季節效應</b>－根據歷史資料回測，發現 10 月股市的回落程度顯著，因此在該月月底的基礎加碼（Fallback buy）將上調至 1.5 份。</p>
     </div>
   </section>
 
