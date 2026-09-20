@@ -979,7 +979,6 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
       const selectors = [
         '.report-hero h1',
         '.hero-copy p',
-        '.hero-meta span',
         '.hero-stat span',
         '.strategy-thesis .eyebrow',
         '.thesis-copy h2',
@@ -1280,14 +1279,12 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
       const heroCost = document.querySelector('#heroCost');
       const heroXirr = document.querySelector('#heroXirr');
       const heroBuyCount = document.querySelector('#heroBuyCount');
-      const heroPeriod = document.querySelector('#heroPeriod');
       const heroYears = document.querySelector('#heroYears');
       if (subtitle) subtitle.textContent = `最新資料日：${m.finalDate}`;
       if (heroFinalValue) heroFinalValue.textContent = money(m.finalValStrat);
       if (heroCost) heroCost.textContent = money(m.costStrat);
       if (heroXirr) heroXirr.textContent = pct(m.xirrStrat);
       if (heroBuyCount) heroBuyCount.textContent = intFmt.format(result.buys.length);
-      if (heroPeriod) heroPeriod.textContent = `${m.startDate} 至 ${m.finalDate}`;
       if (heroYears) heroYears.textContent = `約 ${years.toFixed(1)} 年`;
       const isDetailPage = document.body.dataset.page === 'detail';
       const performanceHeading = isDetailPage ? 'Apex-SOX 策略 vs 純定期定額策略' : 'Apex 策略 vs 純定期定額策略';
@@ -2051,12 +2048,13 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
         performance_heading = "Apex 策略 vs 純定期定額策略"
         chart_intro_heading = "美股 & 半導體一路向上，回撤就是買點"
         chart_note = f"互動提示：拖曳可放大區間，雙擊可重設；右側圖例可點擊開關線條。<br>{source_details}"
-    pitch_date_controls = "" if is_detail else """
+    pitch_date_controls = "" if is_detail else f"""
         <div class="hero-controls" aria-label="自訂回測設定">
           <div class="hero-control-fields">
             <label>起始日期<input id="startDate" type="date"></label>
             <label>結束日期<input id="endDate" type="date"></label>
             <label>一份金額<input id="baseAmount" type="number" min="500" max="50000" step="500" inputmode="numeric"></label>
+            <div class="hero-duration"><span>回測期間</span><b id="heroYears">約 {years:.1f} 年</b></div>
           </div>
           <div class="hero-control-actions">
             <button id="applyDates" type="button">套用設定</button>
@@ -2068,15 +2066,11 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     page_title = "SOX 定投策略 - Apex Strategy"
     report_summary = f"""
   <header class="report-hero">
+    <div class="hero-latest subtitle">{subtitle}</div>
     <div class="hero-inner">
       <div class="hero-copy">
         <h1>{hero_title_html}</h1>
         <p>{hero_description}</p>
-        <div class="hero-meta">
-          <span class="subtitle">{subtitle}</span>
-          <span id="heroPeriod">{start_date.date()} 至 {metrics['final_date'].date()}</span>
-          <span id="heroYears">約 {years:.1f} 年</span>
-        </div>
         {hero_actions}
       </div>
       <div class="hero-side">
@@ -2344,21 +2338,21 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     body.copy-editing [data-copy-editable="true"]:hover, body.copy-editing [data-copy-editable="true"]:focus {{ outline-color: rgba(98, 230, 255, 0.85); background: rgba(98, 230, 255, 0.07); }}
     .report-hero {{ position: relative; overflow: hidden; padding: 68px 28px 42px; background: linear-gradient(135deg, rgba(7, 16, 25, 0.92), rgba(11, 31, 48, 0.94)); border-bottom: 1px solid var(--line); }}
     .report-hero::after {{ content: ""; position: absolute; inset: auto 0 0; height: 1px; background: linear-gradient(90deg, transparent, var(--cyan), var(--amber), transparent); opacity: 0.85; }}
-    .hero-inner {{ position: relative; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(380px, 0.95fr); gap: 36px; align-items: end; max-width: 1180px; margin: 0 auto; }}
+    .hero-inner {{ position: relative; display: grid; grid-template-columns: minmax(0, 0.92fr) minmax(560px, 1.08fr); gap: 36px; align-items: end; max-width: 1180px; margin: 0 auto; }}
     .report-kicker {{ display: inline-block; margin-bottom: 14px; color: var(--cyan); font-size: 12px; font-weight: 700; letter-spacing: 0; text-transform: uppercase; }}
     h1 {{ margin: 0; color: var(--text); font-size: 58px; line-height: 0.98; letter-spacing: 0; }}
     .hero-copy p {{ max-width: 690px; margin: 22px 0 0; color: var(--soft); font-size: 20px; line-height: 1.7; }}
-    .hero-meta {{ display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; color: var(--muted); font-size: 13px; }}
-    .hero-meta span {{ padding: 8px 11px; background: rgba(13, 26, 39, 0.86); border: 1px solid var(--line); border-radius: 6px; }}
     .subtitle {{ color: var(--cyan); font-weight: 700; }}
+    .hero-latest {{ position: absolute; z-index: 2; top: 18px; right: 28px; padding: 8px 11px; background: rgba(13, 26, 39, 0.9); border: 1px solid var(--line); border-radius: 6px; font-size: 13px; font-variant-numeric: tabular-nums; }}
     .hero-actions {{ display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }}
     .nav-button {{ display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 0 15px; border: 1px solid var(--line); border-radius: 6px; color: var(--soft); text-decoration: none; font-size: 13px; font-weight: 700; }}
     .nav-button.primary {{ color: #031018; background: var(--cyan); border-color: rgba(98, 230, 255, 0.58); }}
     .hero-side {{ display: grid; gap: 10px; min-width: 0; }}
     .hero-controls {{ padding: 13px; background: rgba(13, 26, 39, 0.92); border: 1px solid var(--line); border-radius: 8px; }}
-    .hero-control-fields {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }}
-    .hero-control-fields label {{ display: grid; gap: 6px; min-width: 0; color: var(--muted); font-size: 11px; }}
+    .hero-control-fields {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; }}
+    .hero-control-fields label, .hero-duration {{ display: grid; gap: 6px; min-width: 0; color: var(--muted); font-size: 11px; }}
     .hero-control-fields input {{ width: 100%; height: 35px; min-width: 0; border: 1px solid var(--line); border-radius: 6px; padding: 0 9px; color: var(--text); background: rgba(7, 16, 25, 0.9); font: inherit; font-size: 12px; font-variant-numeric: tabular-nums; }}
+    .hero-duration b {{ display: flex; align-items: center; height: 35px; min-width: 0; border: 1px solid var(--line); border-radius: 6px; padding: 0 9px; color: var(--soft); background: rgba(7, 16, 25, 0.9); font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; }}
     .hero-control-actions {{ display: flex; align-items: center; gap: 8px; margin-top: 10px; }}
     .hero-control-actions button {{ height: 35px; border: 1px solid rgba(98, 230, 255, 0.42); border-radius: 6px; padding: 0 13px; color: #031018; background: var(--cyan); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }}
     .hero-control-actions button.secondary {{ color: var(--soft); background: transparent; border-color: var(--line); }}
@@ -2534,10 +2528,8 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
       h1 {{ font-size: 31px; }}
       .report-hero {{ padding: 28px 18px 22px; }}
       .hero-copy p {{ margin-top: 14px; font-size: 15px; line-height: 1.65; }}
-      .hero-meta {{ gap: 8px; margin-top: 18px; }}
-      .hero-meta span {{ padding: 6px 9px; }}
+      .hero-latest {{ position: static; width: max-content; margin: 0 0 18px auto; }}
       .hero-control-fields {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
-      .hero-control-fields label:last-child {{ grid-column: 1 / -1; }}
       .hero-control-actions {{ align-items: stretch; flex-wrap: wrap; }}
       .hero-control-actions button {{ flex: 1 1 120px; }}
       .hero-control-actions .date-status {{ flex-basis: 100%; }}
