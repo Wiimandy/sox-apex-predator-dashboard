@@ -24,6 +24,7 @@ YAHOO_TICKERS = {
     "SPX": "^GSPC",
     "VIX": "^VIX",
     "IXIC": "^IXIC",
+    "ETF00830": "00830.TW",
 }
 
 # Change the start date when needed, then rerun this file to refresh every table and chart.
@@ -101,12 +102,15 @@ def load_from_yahoo_once() -> tuple[pd.DataFrame, list[str]]:
             "SPX": "Close_SPX",
             "VIX": "Close_VIX",
             "IXIC": "Close_IXIC",
+            "ETF00830": "Close_00830",
         }
     )
     merged.index = pd.to_datetime(merged.index).tz_localize(None)
     merged = merged.sort_index()
     for col in merged.columns:
         merged[col] = pd.to_numeric(merged[col], errors="coerce")
+    if "Close_00830" in merged.columns:
+        merged["Close_00830"] = merged["Close_00830"].ffill()
     merged = merged.dropna(subset=["Close", "Close_VIX", "Close_SPX", "Close_IXIC"])
     if merged.empty:
         raise ValueError("Yahoo Finance data is empty after alignment.")
@@ -363,6 +367,9 @@ def run_strategy(df_raw: pd.DataFrame, config: dict) -> dict:
                     "SOX": price,
                     "VIX": vix,
                     "RMDD": rmdd,
+                    "ETF00830": None
+                    if pd.isna(row.get("Close_00830"))
+                    else float(row["Close_00830"]),
                     "Cum_Ret": row["Cumulative_Return"],
                 }
             )
@@ -428,6 +435,9 @@ def build_market_rows(df_raw: pd.DataFrame, config: dict) -> list[dict]:
                 "Close": float(price),
                 "VIX": float(vix),
                 "RMDD": float(rmdd),
+                "ETF00830": None
+                if pd.isna(row.get("Close_00830"))
+                else float(row["Close_00830"]),
                 "PrevRMDD": None if pd.isna(row["Prev_RMDD"]) else float(row["Prev_RMDD"]),
                 "FallbackDay": bool(row["Fallback_Day"]),
             }
@@ -879,6 +889,7 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
             SOX: price,
             VIX: vix,
             RMDD: rmdd,
+            ETF00830: Number.isFinite(row.ETF00830) ? row.ETF00830 : null,
             Cum_Ret: row.CumRet,
           });
         });
@@ -935,10 +946,15 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
       const cards = document.querySelector('.cards');
       if (!cards) return;
       const latest = result.curve[result.curve.length - 1];
+      const latestEtf = [...result.curve].reverse().find(row => Number.isFinite(row.ETF00830));
+      const etfPrice = latestEtf
+        ? `NT$${latestEtf.ETF00830.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+        : '--';
       cards.innerHTML = `
         <div class="card"><span>最新 SOX</span><b>${latest.SOX.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b></div>
         <div class="card"><span>最新 VIX</span><b>${latest.VIX.toFixed(2)}</b></div>
         <div class="card"><span>目前 RMDD</span><b>${(latest.RMDD * 100).toFixed(2)}%</b></div>
+        <div class="card"><span>00830 ETF 現價</span><b>${etfPrice}</b></div>
       `;
     }
 
@@ -1943,11 +1959,15 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
 
     subtitle = f"最新資料日：{metrics['final_date'].date()}"
     source_details = f"資料來源：{escape(source_label)}｜原始 ticker：{escape(', '.join(map(str, tickers)))}"
+    etf_prices = pd.to_numeric(curve.get("ETF00830"), errors="coerce").dropna()
+    latest_etf_price = float(etf_prices.iloc[-1]) if not etf_prices.empty else None
+    latest_etf_text = f"NT${latest_etf_price:,.2f}" if latest_etf_price is not None else "--"
 
     metrics_cards = f"""
       <div class="card"><span>最新 SOX</span><b>{latest['SOX']:,.2f}</b></div>
       <div class="card"><span>最新 VIX</span><b>{latest['VIX']:.2f}</b></div>
       <div class="card"><span>目前 RMDD</span><b>{latest['RMDD'] * 100:.2f}%</b></div>
+      <div class="card"><span>00830 ETF 現價</span><b>{latest_etf_text}</b></div>
     """
     start_date = result["data"].index[0]
     years = (metrics["final_date"] - start_date).days / 365.25
@@ -2380,7 +2400,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     .date-panel button {{ height: 36px; border: 1px solid rgba(98, 230, 255, 0.42); border-radius: 6px; padding: 0 14px; color: #031018; background: var(--cyan); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }}
     .date-panel button.secondary {{ background: transparent; color: var(--soft); border-color: var(--line); }}
     .date-status {{ margin-left: auto; color: var(--muted); font-size: 12px; }}
-    .cards {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; max-width: 1180px; margin: 0 auto; padding: 16px 28px 0; }}
+    .cards {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; max-width: 1180px; margin: 0 auto; padding: 16px 28px 0; }}
     .card {{ background: rgba(13, 26, 39, 0.92); border: 1px solid var(--line); border-radius: 8px; padding: 16px; }}
     .card span {{ display: block; color: var(--muted); font-size: 13px; margin-bottom: 7px; }}
     .card b {{ color: var(--text); font-size: 22px; }}
@@ -2511,7 +2531,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
       h1 {{ font-size: 36px; }}
       .hero-copy p {{ font-size: 16px; }}
       .strategy-thesis {{ grid-template-columns: 1fr; padding: 0 12px; }}
-      .cards {{ grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 12px; }}
+      .cards {{ grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 12px; }}
       .date-controls {{ padding: 12px; }}
       .date-status {{ margin-left: 0; flex-basis: 100%; }}
       .performance {{ padding: 0 12px; }}
