@@ -2481,7 +2481,7 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     .trade-list em {{ color: var(--cyan); font-size: 13px; font-style: normal; font-weight: 700; text-align: right; }}
     .trade-summary p {{ margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }}
     .annual-section {{ margin-top: 30px; padding-top: 14px; border-top: 1px solid rgba(149, 179, 210, 0.14); }}
-    .annual-total {{ display: inline-flex; align-items: baseline; gap: 6px; margin: 9px 0 8px; padding: 7px 9px; background: rgba(98, 230, 255, 0.09); }}
+    .annual-total {{ display: inline-flex; align-items: baseline; gap: 6px; margin: 9px 0 8px; padding: 7px 9px; background: transparent; }}
     .annual-total b {{ color: var(--cyan); font-size: 30px; line-height: 1; }}
     .annual-total span {{ color: var(--muted); font-size: 12px; }}
     .annual-list {{ padding-bottom: 0; border-top: 1px solid rgba(149, 179, 210, 0.14); }}
