@@ -1028,6 +1028,11 @@
       if (heroYears) heroYears.textContent = `約 ${years.toFixed(1)} 年`;
       const isDetailPage = document.body.dataset.page === 'detail';
       const performanceHeading = isDetailPage ? 'Apex-SOX 策略 vs 純定期定額策略' : 'Apex 策略 vs 純定期定額策略';
+      const compactHeaderLabel = isDetailPage ? '兩種策略，各項指標比較' : '核心指標';
+      const apexColumnLabel = isDetailPage ? 'Apex Strategy' : 'Apex Predator';
+      const costRowLabel = isDetailPage ? '滾動回撤幅度 RMDD' : '總投入';
+      const xirrRowLabel = isDetailPage ? '恐慌指數 VIX' : '年化 XIRR';
+      const buyFrequencyRowLabel = isDetailPage ? '季節效應' : '買入頻率';
 
       document.querySelector('.performance').innerHTML = `
         ${isDetailPage ? renderSignalPanels(result) : ''}
@@ -1063,11 +1068,11 @@
               </article>
             </div>
             <div class="compact-comparison">
-              <div class="compact-row compact-head"><span>核心指標</span><strong>Apex Predator</strong><strong>純 DCA</strong><strong>差值</strong></div>
+              <div class="compact-row compact-head"><span>${compactHeaderLabel}</span><strong>${apexColumnLabel}</strong><strong>純 DCA</strong><strong>差值</strong></div>
               <div class="compact-row" data-metric="final-value" tabindex="0"><span>最終資產</span><b>${money(m.finalValStrat)}</b><b>${money(m.finalValDca)}</b><b class="diff-neutral">${signedIntFmt.format(finalValueDiff)}</b></div>
-              <div class="compact-row" data-metric="cost" tabindex="0"><span>總投入</span><b>${money(m.costStrat)}</b><b>${money(m.costDca)}</b><b class="diff-neutral">${signedIntFmt.format(costDiff)}</b></div>
-              <div class="compact-row emphasis" data-metric="xirr" tabindex="0"><span>年化 XIRR</span><b>${pct(m.xirrStrat)}</b><b>${pct(m.xirrDca)}</b><b class="${diffClass(m.xirrDiff)}">${signedPct(m.xirrDiff)}</b></div>
-              <div class="compact-row" data-metric="buy-frequency" tabindex="0"><span>買入頻率</span><b>${stratBuyFrequency.toFixed(1)} 次／年</b><b>${dcaBuyFrequency.toFixed(1)} 次／年</b><b class="diff-neutral">${buyFrequencyDiff >= 0 ? '+' : ''}${buyFrequencyDiff.toFixed(1)} 次／年</b></div>
+              <div class="compact-row" data-metric="cost" tabindex="0"><span>${costRowLabel}</span><b>${money(m.costStrat)}</b><b>${money(m.costDca)}</b><b class="diff-neutral">${signedIntFmt.format(costDiff)}</b></div>
+              <div class="compact-row emphasis" data-metric="xirr" tabindex="0"><span>${xirrRowLabel}</span><b>${pct(m.xirrStrat)}</b><b>${pct(m.xirrDca)}</b><b class="${diffClass(m.xirrDiff)}">${signedPct(m.xirrDiff)}</b></div>
+              <div class="compact-row" data-metric="buy-frequency" tabindex="0"><span>${buyFrequencyRowLabel}</span><b>${stratBuyFrequency.toFixed(1)} 次／年</b><b>${dcaBuyFrequency.toFixed(1)} 次／年</b><b class="diff-neutral">${buyFrequencyDiff >= 0 ? '+' : ''}${buyFrequencyDiff.toFixed(1)} 次／年</b></div>
               <div class="compact-row"><span>帳戶資產 MDD</span><b>${pct(stratAccountMdd)}</b><b>${pct(dcaAccountMdd)}</b><b class="${diffClass(accountMddDiff)}">${signedPct(accountMddDiff)}</b></div>
             </div>
           </div>

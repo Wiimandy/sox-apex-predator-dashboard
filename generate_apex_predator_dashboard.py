@@ -1304,6 +1304,11 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
       if (heroYears) heroYears.textContent = `約 ${years.toFixed(1)} 年`;
       const isDetailPage = document.body.dataset.page === 'detail';
       const performanceHeading = isDetailPage ? 'Apex-SOX 策略 vs 純定期定額策略' : 'Apex 策略 vs 純定期定額策略';
+      const compactHeaderLabel = isDetailPage ? '兩種策略，各項指標比較' : '核心指標';
+      const apexColumnLabel = isDetailPage ? 'Apex Strategy' : 'Apex Predator';
+      const costRowLabel = isDetailPage ? '滾動回撤幅度 RMDD' : '總投入';
+      const xirrRowLabel = isDetailPage ? '恐慌指數 VIX' : '年化 XIRR';
+      const buyFrequencyRowLabel = isDetailPage ? '季節效應' : '買入頻率';
 
       document.querySelector('.performance').innerHTML = `
         ${isDetailPage ? renderSignalPanels(result) : ''}
@@ -1339,11 +1344,11 @@ def build_interactive_script(market_rows: list[dict], client_config: dict, ticke
               </article>
             </div>
             <div class="compact-comparison">
-              <div class="compact-row compact-head"><span>核心指標</span><strong>Apex Predator</strong><strong>純 DCA</strong><strong>差值</strong></div>
+              <div class="compact-row compact-head"><span>${compactHeaderLabel}</span><strong>${apexColumnLabel}</strong><strong>純 DCA</strong><strong>差值</strong></div>
               <div class="compact-row" data-metric="final-value" tabindex="0"><span>最終資產</span><b>${money(m.finalValStrat)}</b><b>${money(m.finalValDca)}</b><b class="diff-neutral">${signedIntFmt.format(finalValueDiff)}</b></div>
-              <div class="compact-row" data-metric="cost" tabindex="0"><span>總投入</span><b>${money(m.costStrat)}</b><b>${money(m.costDca)}</b><b class="diff-neutral">${signedIntFmt.format(costDiff)}</b></div>
-              <div class="compact-row emphasis" data-metric="xirr" tabindex="0"><span>年化 XIRR</span><b>${pct(m.xirrStrat)}</b><b>${pct(m.xirrDca)}</b><b class="${diffClass(m.xirrDiff)}">${signedPct(m.xirrDiff)}</b></div>
-              <div class="compact-row" data-metric="buy-frequency" tabindex="0"><span>買入頻率</span><b>${stratBuyFrequency.toFixed(1)} 次／年</b><b>${dcaBuyFrequency.toFixed(1)} 次／年</b><b class="diff-neutral">${buyFrequencyDiff >= 0 ? '+' : ''}${buyFrequencyDiff.toFixed(1)} 次／年</b></div>
+              <div class="compact-row" data-metric="cost" tabindex="0"><span>${costRowLabel}</span><b>${money(m.costStrat)}</b><b>${money(m.costDca)}</b><b class="diff-neutral">${signedIntFmt.format(costDiff)}</b></div>
+              <div class="compact-row emphasis" data-metric="xirr" tabindex="0"><span>${xirrRowLabel}</span><b>${pct(m.xirrStrat)}</b><b>${pct(m.xirrDca)}</b><b class="${diffClass(m.xirrDiff)}">${signedPct(m.xirrDiff)}</b></div>
+              <div class="compact-row" data-metric="buy-frequency" tabindex="0"><span>${buyFrequencyRowLabel}</span><b>${stratBuyFrequency.toFixed(1)} 次／年</b><b>${dcaBuyFrequency.toFixed(1)} 次／年</b><b class="diff-neutral">${buyFrequencyDiff >= 0 ? '+' : ''}${buyFrequencyDiff.toFixed(1)} 次／年</b></div>
               <div class="compact-row"><span>帳戶資產 MDD</span><b>${pct(stratAccountMdd)}</b><b>${pct(dcaAccountMdd)}</b><b class="${diffClass(accountMddDiff)}">${signedPct(accountMddDiff)}</b></div>
             </div>
           </div>
@@ -2014,6 +2019,11 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     standard_count = int((buys["Type"] == "STD Level Buy").sum())
     sniper_count = int((buys["Type"] == "Sniper Shot").sum())
     performance_class = "performance detail-performance" if is_detail else "performance pitch-performance"
+    compact_header_label = "兩種策略，各項指標比較" if is_detail else "核心指標"
+    apex_column_label = "Apex Strategy" if is_detail else "Apex Predator"
+    cost_row_label = "滾動回撤幅度 RMDD" if is_detail else "總投入"
+    xirr_row_label = "恐慌指數 VIX" if is_detail else "年化 XIRR"
+    buy_frequency_row_label = "季節效應" if is_detail else "買入頻率"
     trade_summary_html = f"""
       <aside class="trade-summary">
         <div class="trade-title">交易訊號統計</div>
@@ -2249,11 +2259,11 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
           </article>
         </div>
         <div class="compact-comparison">
-          <div class="compact-row compact-head"><span>核心指標</span><strong>Apex Predator</strong><strong>純 DCA</strong><strong>差值</strong></div>
+          <div class="compact-row compact-head"><span>{compact_header_label}</span><strong>{apex_column_label}</strong><strong>純 DCA</strong><strong>差值</strong></div>
           <div class="compact-row" data-metric="final-value" tabindex="0"><span>最終資產</span><b>{money(metrics['final_val_strat'])}</b><b>{money(metrics['final_val_dca'])}</b><b class="diff-neutral">{final_value_diff:+,.0f}</b></div>
-          <div class="compact-row" data-metric="cost" tabindex="0"><span>總投入</span><b>{money(metrics['cost_strat'])}</b><b>{money(metrics['cost_dca'])}</b><b class="diff-neutral">{cost_diff:+,.0f}</b></div>
-          <div class="compact-row emphasis" data-metric="xirr" tabindex="0"><span>年化 XIRR</span><b>{pct(metrics['xirr_strat'])}</b><b>{pct(metrics['xirr_dca'])}</b><b class="{difference_class(metrics['xirr_diff'])}">{metrics['xirr_diff']:+.2f}%</b></div>
-          <div class="compact-row" data-metric="buy-frequency" tabindex="0"><span>買入頻率</span><b>{strat_buy_frequency:.1f} 次／年</b><b>{dca_buy_frequency:.1f} 次／年</b><b class="diff-neutral">{buy_frequency_diff:+.1f} 次／年</b></div>
+          <div class="compact-row" data-metric="cost" tabindex="0"><span>{cost_row_label}</span><b>{money(metrics['cost_strat'])}</b><b>{money(metrics['cost_dca'])}</b><b class="diff-neutral">{cost_diff:+,.0f}</b></div>
+          <div class="compact-row emphasis" data-metric="xirr" tabindex="0"><span>{xirr_row_label}</span><b>{pct(metrics['xirr_strat'])}</b><b>{pct(metrics['xirr_dca'])}</b><b class="{difference_class(metrics['xirr_diff'])}">{metrics['xirr_diff']:+.2f}%</b></div>
+          <div class="compact-row" data-metric="buy-frequency" tabindex="0"><span>{buy_frequency_row_label}</span><b>{strat_buy_frequency:.1f} 次／年</b><b>{dca_buy_frequency:.1f} 次／年</b><b class="diff-neutral">{buy_frequency_diff:+.1f} 次／年</b></div>
           <div class="compact-row"><span>帳戶資產 MDD</span><b>{pct(strat_account_mdd)}</b><b>{pct(dca_account_mdd)}</b><b class="{difference_class(account_mdd_diff)}">{account_mdd_diff:+.2f}%</b></div>
         </div>
       </div>
@@ -2278,8 +2288,8 @@ def build_html(result: dict, tickers: list[str], source_label: str, market_rows:
     detail_header = """
   <section class="detail-header">
     <div>
-      <span class="eyebrow">策略 Detail</span>
-      <h2>策略監控、規則與參數分析</h2>
+      <span class="eyebrow">APEX Strategy 資產測試頁面</span>
+      <h2>輸入你的個人資產，回測策略的績效</h2>
     </div>
     <a class="nav-button" href="index.html">返回 Pitch 頁</a>
   </section>
